@@ -14,6 +14,7 @@ commonsIo = "2.19.0"
 mockk = "1.14.2"
 kaml = "0.77.1"
 ktlint = "13.1.0"
+arrow = "2.2.0"
 
 [libraries]
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
