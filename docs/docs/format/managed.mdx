@@ -14,12 +14,13 @@
 
 ```
 your-server/
-├── mpm.json
-├── mpm-lock.yaml
 ├── plugins/
 │   ├── LuckPerms-Bukkit-5.4.102.jar
 │   ├── Vault.jar
 │   └── mpm/
+│       ├── mpm.json
+│       ├── mpm-lock.yaml
+│       ├── repository/
 │       └── metadata/
 │           ├── LuckPerms.yaml     ← プラグインごとのメタデータ
 │           ├── Vault.yaml          ← プラグインごとのメタデータ
@@ -386,5 +387,5 @@ mpmInfo:
 
 ## 関連ファイル
 
-- [mpm.json](./mpm-config) - プロジェクト設定ファイル
-- [mpm-lock.yaml](./mpm-lock) - ロックファイル
+- [mpm.json](/format/mpm-config) - プロジェクト設定ファイル
+- [mpm-lock.yaml](/format/mpm-lock) - ロックファイル

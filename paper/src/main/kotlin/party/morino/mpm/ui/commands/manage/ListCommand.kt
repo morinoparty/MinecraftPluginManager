@@ -7,7 +7,7 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.ui.commands
+package party.morino.mpm.ui.commands.manage
 
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.annotations.Command
