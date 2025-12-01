@@ -123,3 +123,5 @@ run/
 bin/
 
 !.idea/copyright/
+
+**/node_modules
