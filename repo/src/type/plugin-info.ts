@@ -13,9 +13,12 @@ const RepositorySchema = z.object({
     type: z.string(),
     id: z.string(),
     fileNameRegex: z.string(),
-    versionModifier : z.string().default("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$").optional(),
+    versionModifier: z
+        .string()
+        .default("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$")
+        .optional(),
     downloadUrl: z.string().optional(),
-    fileNameTemplate : z.string().optional(),
+    fileNameTemplate: z.string().optional(),
 });
 
 export const PluginInfoSchema = z.object({

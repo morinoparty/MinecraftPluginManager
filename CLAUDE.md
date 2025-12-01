@@ -73,6 +73,20 @@ Spigot, Modrinth, Hanger, GitHubといった複数のプラットフォームか
 - また、新しいディレクトリを作成した場合、docusaurusのカテゴリーを作成してください。
 - なお、文章の文体について、その他の部分で支持があったとしても、ドキュメントに関しては、あくまでも文章の文体で記載してください。
 
+## コンポーネントの利用
+- コンポーネントは、docs/src/components/に配置してください。
+- ui libraryとして、shadcn/uiを利用しています。 追加する際は、pnpm dlx shadcn@latest add [component]を実行してください。
+- 上記の理由から、docs/src/components/ui/は触れないでください。
+
+
+## ディレクトリ配置規則
+
+- docs/docs/ にドキュメントを配置します。
+- app/src/main/kotlin/party/morino/mpm/ にプラグインのメインクラスを配置します。
+- api/src/main/kotlin/party/morino/mpm/api/ にAPIのインターフェースを配置します。
+- data classはそれぞれのmodelに配置します。
+- 一つのファイルに一つのクラスを配置します。
+
 
 # Gitのルール
 
@@ -98,15 +112,6 @@ commitの絵文字などに関しては、changelog.config.jsを参考にして�
 - Issueは英語で書き、適切なラベルを追加してください。
 - 現状存在しないラベルについては、勝手に作成しないでください
 - どうしても必要である場合は、.github/labels.jsonに追加してください
-
-
-## ディレクトリ配置規則
-
-- docs/docs/ にドキュメントを配置します。
-- app/src/main/kotlin/party/morino/mpm/ にプラグインのメインクラスを配置します。
-- api/src/main/kotlin/party/morino/mpm/api/ にAPIのインターフェースを配置します。
-- data classはそれぞれのmodelに配置します。
-- 一つのファイルに一つのクラスを配置します。
 
 
 # 推奨される書き方
