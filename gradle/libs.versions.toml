@@ -1,19 +1,19 @@
 [versions]
 cloud = "2.1.0-SNAPSHOT"
 cloudPaper = "2.0.0-SNAPSHOT"
-paper = "1.21.10-R0.1-SNAPSHOT"
+paper = "1.21.11-pre3-R0.1-SNAPSHOT"
 mccoroutine = "2.22.0"
 koin = "4.1.1"
 coroutine = "1.10.2"
 serialization = "1.9.0"
 reflect = "2.1.20"
-ktor = "3.3.2"
+ktor = "3.3.3"
 junit = "6.1.0-M1"
 mockBukkit = "3.93.2"
 commonsIo = "2.21.0"
-mockk = "1.14.2"
+mockk = "1.14.6"
 kaml = "0.77.1"
-ktlint = "13.1.0"
+ktlint = "14.0.1"
 arrow = "2.2.0"
 
 [libraries]
