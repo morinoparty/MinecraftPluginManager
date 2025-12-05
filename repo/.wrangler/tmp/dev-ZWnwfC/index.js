@@ -17013,7 +17013,7 @@ var RepositorySchema = external_exports.object({
   type: external_exports.string(),
   id: external_exports.string(),
   fileNameRegex: external_exports.string(),
-  versionModifier: external_exports.string().default("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$").optional(),
+  versionModifier: external_exports.string().default("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)").optional(),
   downloadUrl: external_exports.string().optional(),
   fileNameTemplate: external_exports.string().optional()
 });

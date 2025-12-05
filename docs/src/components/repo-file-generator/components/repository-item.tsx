@@ -18,7 +18,7 @@ import { Label } from "@site/src/components/ui/label";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link.js";
 import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw.js";
 import X from "lucide-react/dist/esm/icons/x.js";
-import type React from "react";
+import React from "react";
 import type { RepositoryItemProps } from "../types";
 
 /**
@@ -46,13 +46,6 @@ export const RepositoryItem: React.FC<RepositoryItemProps> = ({
         }
     };
 
-    // ファイル名からversionを抽出
-    const extractVersion = (filename: string): string | null => {
-        // 一般的なversion形式を抽出: x.y.z.w または x.y.z
-        const versionMatch = filename.match(/(\d+\.\d+\.\d+(?:\.\d+)?)/);
-        return versionMatch ? versionMatch[1] : null;
-    };
-
     // versionModifierを適用
     const applyVersionModifier = (version: string, modifier?: string): string | null => {
         if (!modifier) return version;
@@ -73,8 +66,7 @@ export const RepositoryItem: React.FC<RepositoryItemProps> = ({
             return { original: null, modified: null };
         }
 
-        const firstFile = filteredFiles[0];
-        const originalVersion = extractVersion(firstFile);
+        const originalVersion = filteredFiles[0];
 
         if (!originalVersion) {
             return { original: null, modified: null };
@@ -232,7 +224,7 @@ export const RepositoryItem: React.FC<RepositoryItemProps> = ({
                                                             e.target.value || undefined,
                                                     })
                                                 }
-                                                placeholder="^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+                                                placeholder="(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
                                             />
                                         </div>
 

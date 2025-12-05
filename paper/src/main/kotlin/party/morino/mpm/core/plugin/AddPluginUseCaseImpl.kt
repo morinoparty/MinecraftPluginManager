@@ -12,17 +12,30 @@ package party.morino.mpm.core.plugin
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import com.charleskorn.kaml.Yaml
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
+import party.morino.mpm.api.config.plugin.HistoryEntry
+import party.morino.mpm.api.config.plugin.ManagedPlugin
+import party.morino.mpm.api.config.plugin.MetadataDownloadInfo
 import party.morino.mpm.api.config.plugin.MpmConfig
+import party.morino.mpm.api.config.plugin.MpmInfo
+import party.morino.mpm.api.config.plugin.PluginInfo
+import party.morino.mpm.api.config.plugin.PluginSettings
+import party.morino.mpm.api.config.plugin.RepositoryInfo
+import party.morino.mpm.api.config.plugin.VersionDetail
+import party.morino.mpm.api.config.plugin.VersionManagement
 import party.morino.mpm.api.core.plugin.AddPluginUseCase
 import party.morino.mpm.api.core.plugin.DownloaderRepository
 import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.model.repository.RepositoryType
 import party.morino.mpm.api.model.repository.UrlData
-import party.morino.mpm.api.utils.DataClassReplacer.replaceTemplate
 import party.morino.mpm.utils.Utils
 import java.io.File
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * mpm addコマンドに関するユースケースの実装
@@ -59,11 +72,8 @@ class AddPluginUseCaseImpl :
 
         // リポジトリソースからプラグインが存在するか確認
         val repositoryFile = repositorySourceManager.getRepositoryFile(pluginName)
-
-        if (repositoryFile == null) {
-            return "リポジトリファイルが見つかりません: $pluginName\n利用可能なリポジトリソースで '$pluginName.json' を検索しましたが見つかりませんでした。"
+            ?: return "リポジトリファイルが見つかりません: $pluginName\n利用可能なリポジトリソースで '$pluginName.json' を検索しましたが見つかりませんでした."
                 .left()
-        }
 
         // リポジトリ設定から最初のリポジトリを取得
         val firstRepository =
@@ -101,35 +111,80 @@ class AddPluginUseCaseImpl :
                     .left()
             }
 
-        // プラグインをダウンロード
-        val downloadedFile =
-            try {
-                downloaderRepository.downloadByVersion(
-                    urlData,
-                    latestVersion,
-                    firstRepository.fileNamePattern
-                )
-            } catch (e: Exception) {
-                return "プラグインのダウンロードに失敗しました (${firstRepository.type}: ${firstRepository.repositoryId}): ${e.message}"
-                    .left()
+        // バージョンを正規化
+        val versionPattern = firstRepository.versionPattern
+        val normalizedVersion =
+            if (versionPattern != null) {
+                val versionRegex = Regex(versionPattern)
+                versionRegex.find(latestVersion.version)?.value ?: latestVersion.version
+            } else {
+                latestVersion.version
             }
 
-        if (downloadedFile == null) {
-            return "プラグインファイルのダウンロードに失敗しました (${firstRepository.type}: ${firstRepository.repositoryId})。".left()
+        val now = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+
+        // メタデータを作成
+        val metadata =
+            ManagedPlugin(
+                pluginInfo =
+                    PluginInfo(
+                        name = pluginName,
+                        version = normalizedVersion
+                    ),
+                mpmInfo =
+                    MpmInfo(
+                        repository =
+                            RepositoryInfo(
+                                type = RepositoryType.valueOf(firstRepository.type.uppercase()),
+                                id = firstRepository.repositoryId
+                            ),
+                        version =
+                            VersionManagement(
+                                current =
+                                    VersionDetail(
+                                        raw = latestVersion.version,
+                                        normalized = normalizedVersion
+                                    ),
+                                latest =
+                                    VersionDetail(
+                                        raw = latestVersion.version,
+                                        normalized = normalizedVersion
+                                    ),
+                                lastChecked = now
+                            ),
+                        download =
+                            MetadataDownloadInfo(
+                                downloadId = latestVersion.downloadId
+                            ),
+                        settings =
+                            PluginSettings(
+                                lock = false,
+                                autoUpdate = false
+                            ),
+                        history =
+                            listOf(
+                                HistoryEntry(
+                                    version = normalizedVersion,
+                                    installedAt = now,
+                                    action = "add"
+                                )
+                            ),
+                        fileNamePattern = firstRepository.fileNamePattern,
+                        fileNameTemplate = firstRepository.fileNameTemplate
+                    )
+            )
+
+        // メタデータをYAMLとして保存
+        val metadataDir = pluginDirectory.getMetadataDirectory()
+        if (!metadataDir.exists()) {
+            metadataDir.mkdirs()
         }
-
-        // ファイル名を生成（fileNameTemplateを使用、nullの場合はデフォルトテンプレート）
-        val template = firstRepository.fileNameTemplate ?: "<pluginName>-<version.current.edited_version>.jar"
-        val fileName = generateFileName(template, pluginName, latestVersion.version)
-
-        // ダウンロードしたファイルをpluginsディレクトリに移動
-        val pluginsDir = pluginDirectory.getPluginsDirectory()
-        val targetFile = File(pluginsDir, fileName)
+        val metadataFile = File(metadataDir, "$pluginName.yaml")
         try {
-            downloadedFile.copyTo(targetFile, overwrite = true)
-            downloadedFile.delete() // 一時ファイルを削除
+            val yamlString = Yaml.default.encodeToString(ManagedPlugin.serializer(), metadata)
+            metadataFile.writeText(yamlString)
         } catch (e: Exception) {
-            return "プラグインファイルの移動に失敗しました: ${e.message}".left()
+            return "メタデータの保存に失敗しました: ${e.message}".left()
         }
 
         // mpm.jsonを読み込む
@@ -161,57 +216,5 @@ class AddPluginUseCaseImpl :
         } catch (e: Exception) {
             "mpm.jsonの更新に失敗しました: ${e.message}".left()
         }
-    }
-
-    /**
-     * ファイル名テンプレートからファイル名を生成
-     * DataClassReplacerを使用してプレースホルダーを実際の値で置き換える
-     *
-     * @param template ファイル名テンプレート
-     * @param pluginName プラグイン名
-     * @param versionString バージョン文字列
-     * @return 生成されたファイル名
-     */
-    private fun generateFileName(
-        template: String,
-        pluginName: String,
-        versionString: String
-    ): String {
-        // バージョンをパースしてセマンティックバージョニング形式の各部分を取得
-        val versionParts = versionString.split(".", "-", "_").filter { it.isNotEmpty() }
-        val major = versionParts.getOrNull(0) ?: "0"
-        val minor = versionParts.getOrNull(1) ?: "0"
-        val patch = versionParts.getOrNull(2) ?: "0"
-
-        // ファイル名生成用のデータクラス（定義順序に注意）
-        data class CurrentVersion(
-            val edited_version: String
-        )
-
-        data class VersionData(
-            val major: String,
-            val minor: String,
-            val patch: String,
-            val current: CurrentVersion
-        )
-
-        data class FileNameData(
-            val pluginName: String,
-            val version: VersionData
-        )
-
-        // データクラスを作成
-        val data = FileNameData(
-            pluginName = pluginName,
-            version = VersionData(
-                major = major,
-                minor = minor,
-                patch = patch,
-                current = CurrentVersion(edited_version = versionString)
-            )
-        )
-
-        // DataClassReplacerを使用してプレースホルダーを置き換え
-        return template.replaceTemplate(data)
     }
 }

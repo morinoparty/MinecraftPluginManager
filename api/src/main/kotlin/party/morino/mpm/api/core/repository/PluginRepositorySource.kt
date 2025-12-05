@@ -1,7 +1,9 @@
 /*
  * Written in 2023-2025 by Nikomaru <nikomaru@nikomaru.dev>
  *
- * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide.This software is distributed without any warranty.
+ * To the extent possible under law, the author(s) have dedicated all copyright
+and related and neighboring rights to this software to the public domain worldwide.
+This software is distributed without any warranty.
  *
  * You should have received a copy of the CC0 Public Domain Dedication along with this software.
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
@@ -77,7 +79,7 @@ data class RepositoryFile(
  *   - Modrinth: プロジェクトIDまたはslug（例: "luckperms"）
  * @property versionPattern バージョン番号の検証用正規表現（オプション）
  *   セマンティックバージョニングなど、特定のバージョンフォーマットを強制する場合に使用
- *   例: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$" （セマンティックバージョニング）
+ *   例: "(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)" （セマンティックバージョニング）
  * @property downloadUrlTemplate ダウンロードURLのテンプレート（オプション）
  *   カスタムダウンロードURLを指定する場合に使用
  *   プレースホルダー: {versionId}, {version}, {fileName}

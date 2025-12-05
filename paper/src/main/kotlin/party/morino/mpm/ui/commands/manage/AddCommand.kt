@@ -18,6 +18,7 @@ import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.core.plugin.AddPluginUseCase
+import party.morino.mpm.api.core.plugin.PluginInstallUseCase
 
 /**
  * プラグイン追加コマンドのコントローラー
@@ -29,6 +30,7 @@ import party.morino.mpm.api.core.plugin.AddPluginUseCase
 class AddCommand : KoinComponent {
     // KoinによるDI
     private val addPluginUseCase: AddPluginUseCase by inject()
+    private val pluginInstallUseCase: PluginInstallUseCase by inject()
 
     /**
      * プラグインを管理対象に追加するコマンド
@@ -40,6 +42,9 @@ class AddCommand : KoinComponent {
         sender: CommandSender,
         @Argument("pluginName") pluginName: String
     ) {
+        sender.sendMessage(
+            Component.text("プラグイン '$pluginName' の情報を取得しています...", NamedTextColor.GRAY)
+        )
         // ユースケースを実行
         addPluginUseCase.addPlugin(pluginName).fold(
             // 失敗時の処理
@@ -51,10 +56,25 @@ class AddCommand : KoinComponent {
             // 成功時の処理
             {
                 sender.sendMessage(
-                    Component.text("プラグイン '$pluginName' をダウンロードして管理対象に追加しました。", NamedTextColor.GREEN)
+                    Component.text("プラグイン '$pluginName' の情報を追加しました。", NamedTextColor.GREEN)
                 )
                 sender.sendMessage(
-                    Component.text("変更を反映するには、サーバーを再起動してください。", NamedTextColor.GRAY)
+                    Component.text("プラグイン '$pluginName' をインストールしています...", NamedTextColor.GRAY)
+                )
+                pluginInstallUseCase.installPlugin(pluginName).fold(
+                    { errorMessage ->
+                        sender.sendMessage(
+                            Component.text(errorMessage, NamedTextColor.RED)
+                        )
+                    },
+                    {
+                        sender.sendMessage(
+                            Component.text("プラグイン '$pluginName' をインストールしました。", NamedTextColor.GREEN)
+                        )
+                        sender.sendMessage(
+                            Component.text("変更を反映するには、サーバーを再起動してください。", NamedTextColor.GRAY)
+                        )
+                    }
                 )
             }
         )

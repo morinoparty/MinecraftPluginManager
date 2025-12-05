@@ -7,7 +7,7 @@
     {
       "type": "modrinth",
       "id": "luckperms",
-      "versionModifier": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "versionModifier": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)",
       "fileNameRegex": ".*\\.jar$"
     }
   ]
