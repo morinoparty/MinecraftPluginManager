@@ -7,7 +7,7 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.core.plugin
+package party.morino.mpm.core.plugin.infrastructure
 
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
@@ -93,12 +93,15 @@ class DownloaderRepositoryImpl :
             is UrlData.GithubUrlData -> {
                 GithubDownloader().getLatestVersion(urlData)
             }
+
             is UrlData.SpigotMcUrlData -> {
                 SpigotDownloader().getLatestVersion(urlData)
             }
+
             is UrlData.ModrinthUrlData -> {
                 ModrinthDownloader().getLatestVersion(urlData)
             }
+
             else -> {
                 // 他のリポジトリタイプの実装
                 VersionData("unknown", "unknown")
@@ -121,12 +124,15 @@ class DownloaderRepositoryImpl :
             is UrlData.GithubUrlData -> {
                 GithubDownloader().downloadByVersion(urlData, version, fileNamePattern)
             }
+
             is UrlData.SpigotMcUrlData -> {
                 SpigotDownloader().downloadByVersion(urlData, version, fileNamePattern)
             }
+
             is UrlData.ModrinthUrlData -> {
                 ModrinthDownloader().downloadByVersion(urlData, version, fileNamePattern)
             }
+
             else -> {
                 // 他のリポジトリタイプの実装
                 null

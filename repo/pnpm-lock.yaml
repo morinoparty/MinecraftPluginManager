@@ -15,8 +15,8 @@ importers:
         specifier: ^0.9.25
         version: 0.9.25(hono@4.10.6)
       dayjs:
-        specifier: ^1.11.19
-        version: 1.11.19
+        specifier: '=1.10.8'
+        version: 1.10.8
       hono:
         specifier: ^4.10.6
         version: 4.10.6
@@ -646,8 +646,8 @@ packages:
     resolution: {integrity: sha512-vXiThu1/rlos7EGu8TuNZQEg2e9TvhH9dmS4T4ZVzB7Ao1agEZ6EG3sn5n+hZRYUgduISd1HpngFzAZiDGm5vQ==}
     engines: {node: '>=18'}
 
-  dayjs@1.11.19:
-    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
+  dayjs@1.10.8:
+    resolution: {integrity: sha512-wbNwDfBHHur9UOzNUjeKUOJ0fCb0a52Wx0xInmQ7Y8FstyajiV1NmK1e00cxsr9YrE9r7yAChE0VvpuY5Rnlow==}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -1182,7 +1182,7 @@ snapshots:
 
   cookie@1.1.0: {}
 
-  dayjs@1.11.19: {}
+  dayjs@1.10.8: {}
 
   detect-libc@2.1.2: {}
 

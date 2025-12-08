@@ -7,35 +7,23 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.core.plugin
+package party.morino.mpm.core.plugin.usecase
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
-import com.charleskorn.kaml.Yaml
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
-import party.morino.mpm.api.config.plugin.HistoryEntry
-import party.morino.mpm.api.config.plugin.ManagedPlugin
-import party.morino.mpm.api.config.plugin.MetadataDownloadInfo
 import party.morino.mpm.api.config.plugin.MpmConfig
-import party.morino.mpm.api.config.plugin.MpmInfo
-import party.morino.mpm.api.config.plugin.PluginInfo
-import party.morino.mpm.api.config.plugin.PluginSettings
-import party.morino.mpm.api.config.plugin.RepositoryInfo
-import party.morino.mpm.api.config.plugin.VersionDetail
-import party.morino.mpm.api.config.plugin.VersionManagement
 import party.morino.mpm.api.core.plugin.AddPluginUseCase
 import party.morino.mpm.api.core.plugin.DownloaderRepository
+import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
-import party.morino.mpm.api.model.repository.RepositoryType
 import party.morino.mpm.api.model.repository.UrlData
 import party.morino.mpm.utils.Utils
 import java.io.File
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 
 /**
  * mpm addコマンドに関するユースケースの実装
@@ -48,6 +36,7 @@ class AddPluginUseCaseImpl :
     private val pluginDirectory: PluginDirectory by inject()
     private val repositorySourceManager: PluginRepositorySourceManager by inject()
     private val downloaderRepository: DownloaderRepository by inject()
+    private val metadataManager: PluginMetadataManager by inject()
 
     /**
      * プラグインを管理対象に追加する
@@ -71,9 +60,10 @@ class AddPluginUseCaseImpl :
         }
 
         // リポジトリソースからプラグインが存在するか確認
-        val repositoryFile = repositorySourceManager.getRepositoryFile(pluginName)
-            ?: return "リポジトリファイルが見つかりません: $pluginName\n利用可能なリポジトリソースで '$pluginName.json' を検索しましたが見つかりませんでした."
-                .left()
+        val repositoryFile =
+            repositorySourceManager.getRepositoryFile(pluginName)
+                ?: return "リポジトリファイルが見つかりません: $pluginName\n利用可能なリポジトリソースで '$pluginName.json' を検索しましたが見つかりませんでした."
+                    .left()
 
         // リポジトリ設定から最初のリポジトリを取得
         val firstRepository =
@@ -91,12 +81,15 @@ class AddPluginUseCaseImpl :
                     }
                     UrlData.GithubUrlData(owner = parts[0], repository = parts[1])
                 }
+
                 "modrinth" -> {
                     UrlData.ModrinthUrlData(id = firstRepository.repositoryId)
                 }
+
                 "spigotmc" -> {
                     UrlData.SpigotMcUrlData(resourceId = firstRepository.repositoryId)
                 }
+
                 else -> {
                     return "未対応のリポジトリタイプです: ${firstRepository.type}".left()
                 }
@@ -111,81 +104,14 @@ class AddPluginUseCaseImpl :
                     .left()
             }
 
-        // バージョンを正規化
-        val versionPattern = firstRepository.versionPattern
-        val normalizedVersion =
-            if (versionPattern != null) {
-                val versionRegex = Regex(versionPattern)
-                versionRegex.find(latestVersion.version)?.value ?: latestVersion.version
-            } else {
-                latestVersion.version
-            }
-
-        val now = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
-
         // メタデータを作成
         val metadata =
-            ManagedPlugin(
-                pluginInfo =
-                    PluginInfo(
-                        name = pluginName,
-                        version = normalizedVersion
-                    ),
-                mpmInfo =
-                    MpmInfo(
-                        repository =
-                            RepositoryInfo(
-                                type = RepositoryType.valueOf(firstRepository.type.uppercase()),
-                                id = firstRepository.repositoryId
-                            ),
-                        version =
-                            VersionManagement(
-                                current =
-                                    VersionDetail(
-                                        raw = latestVersion.version,
-                                        normalized = normalizedVersion
-                                    ),
-                                latest =
-                                    VersionDetail(
-                                        raw = latestVersion.version,
-                                        normalized = normalizedVersion
-                                    ),
-                                lastChecked = now
-                            ),
-                        download =
-                            MetadataDownloadInfo(
-                                downloadId = latestVersion.downloadId
-                            ),
-                        settings =
-                            PluginSettings(
-                                lock = false,
-                                autoUpdate = false
-                            ),
-                        history =
-                            listOf(
-                                HistoryEntry(
-                                    version = normalizedVersion,
-                                    installedAt = now,
-                                    action = "add"
-                                )
-                            ),
-                        fileNamePattern = firstRepository.fileNamePattern,
-                        fileNameTemplate = firstRepository.fileNameTemplate
-                    )
-            )
+            metadataManager
+                .createMetadata(pluginName, firstRepository, latestVersion, "add")
+                .getOrElse { return it.left() }
 
-        // メタデータをYAMLとして保存
-        val metadataDir = pluginDirectory.getMetadataDirectory()
-        if (!metadataDir.exists()) {
-            metadataDir.mkdirs()
-        }
-        val metadataFile = File(metadataDir, "$pluginName.yaml")
-        try {
-            val yamlString = Yaml.default.encodeToString(ManagedPlugin.serializer(), metadata)
-            metadataFile.writeText(yamlString)
-        } catch (e: Exception) {
-            return "メタデータの保存に失敗しました: ${e.message}".left()
-        }
+        // メタデータを保存
+        metadataManager.saveMetadata(pluginName, metadata).getOrElse { return it.left() }
 
         // mpm.jsonを読み込む
         val mpmConfig =

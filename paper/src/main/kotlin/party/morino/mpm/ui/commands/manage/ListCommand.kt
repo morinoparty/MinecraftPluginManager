@@ -83,6 +83,7 @@ class ListCommand : KoinComponent {
                 is PluginData.BukkitPluginData -> {
                     sender.sendRichMessage(" - ${plugin.name} (v${plugin.version})")
                 }
+
                 is PluginData.PaperPluginData -> {
                     sender.sendRichMessage(" - ${plugin.name} (v${plugin.version})")
                 }

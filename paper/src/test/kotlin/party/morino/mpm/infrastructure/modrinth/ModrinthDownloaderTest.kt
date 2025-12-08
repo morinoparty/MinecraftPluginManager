@@ -9,13 +9,10 @@
 
 package party.morino.mpm.infrastructure.modrinth
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
-import io.ktor.utils.io.ByteReadChannel
+import io.ktor.client.*
+import io.ktor.client.engine.mock.*
+import io.ktor.http.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -73,6 +70,7 @@ class ModrinthDownloaderTest {
                             headers = headersOf(HttpHeaders.ContentType, "application/json")
                         )
                     }
+
                     else -> {
                         respond(
                             content = ByteReadChannel(""),
@@ -119,6 +117,7 @@ class ModrinthDownloaderTest {
                             headers = headersOf(HttpHeaders.ContentType, "application/json")
                         )
                     }
+
                     request.url.toString().startsWith("https://cdn.modrinth.com/") -> {
                         // ファイルダウンロードのモックレスポンス
                         respond(
@@ -127,6 +126,7 @@ class ModrinthDownloaderTest {
                             headers = headersOf(HttpHeaders.ContentType, "application/java-archive")
                         )
                     }
+
                     else -> {
                         respond(
                             content = ByteReadChannel(""),
@@ -175,6 +175,7 @@ class ModrinthDownloaderTest {
                             headers = headersOf(HttpHeaders.ContentType, "application/json")
                         )
                     }
+
                     request.url.toString().startsWith("https://cdn.modrinth.com/") -> {
                         // ファイルダウンロードのモックレスポンス
                         respond(
@@ -183,6 +184,7 @@ class ModrinthDownloaderTest {
                             headers = headersOf(HttpHeaders.ContentType, "application/java-archive")
                         )
                     }
+
                     else -> {
                         respond(
                             content = ByteReadChannel(""),
@@ -231,6 +233,7 @@ class ModrinthDownloaderTest {
                             headers = headersOf(HttpHeaders.ContentType, "application/json")
                         )
                     }
+
                     else -> {
                         respond(
                             content = ByteReadChannel(""),

@@ -12,7 +12,7 @@ package party.morino.mpm.utils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.koin.test.KoinTest
-import party.morino.mpm.api.utils.DataClassReplacer.replaceTemplate
+import party.morino.mpm.utils.DataClassReplacer.replaceTemplate
 
 class DataClassReplacerTest : KoinTest {
     @Test

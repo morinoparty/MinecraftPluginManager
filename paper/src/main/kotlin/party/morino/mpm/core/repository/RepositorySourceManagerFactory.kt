@@ -13,7 +13,7 @@ import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.config.plugin.MpmConfig
 import party.morino.mpm.api.config.plugin.RepositorySourceConfig
 import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
-import party.morino.mpm.api.utils.Utils
+import party.morino.mpm.utils.Utils
 import java.io.File
 
 /**

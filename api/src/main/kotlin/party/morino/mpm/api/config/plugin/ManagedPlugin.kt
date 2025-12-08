@@ -36,6 +36,7 @@ data class MpmInfo(
     val download: MetadataDownloadInfo,
     val settings: PluginSettings,
     val history: List<HistoryEntry>,
+    val versionPattern: String? = null,
     val fileNamePattern: String? = null,
     val fileNameTemplate: String? = null
 )

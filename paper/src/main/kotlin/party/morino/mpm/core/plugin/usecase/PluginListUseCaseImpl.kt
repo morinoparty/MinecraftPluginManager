@@ -7,7 +7,7 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.core.plugin
+package party.morino.mpm.core.plugin.usecase
 
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent

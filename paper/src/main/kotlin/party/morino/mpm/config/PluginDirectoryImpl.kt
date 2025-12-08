@@ -9,11 +9,11 @@
 
 package party.morino.mpm.config
 
+import java.io.File
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
-import java.io.File
 
 /**
  * プラグインのディレクトリを管理する実装クラス

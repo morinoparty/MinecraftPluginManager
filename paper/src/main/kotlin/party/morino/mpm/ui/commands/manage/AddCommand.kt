@@ -9,8 +9,6 @@
 
 package party.morino.mpm.ui.commands.manage
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
@@ -42,38 +40,41 @@ class AddCommand : KoinComponent {
         sender: CommandSender,
         @Argument("pluginName") pluginName: String
     ) {
-        sender.sendMessage(
-            Component.text("プラグイン '$pluginName' の情報を取得しています...", NamedTextColor.GRAY)
-        )
+        sender.sendRichMessage("<gray>プラグイン '$pluginName' の情報を取得しています...")
+
         // ユースケースを実行
         addPluginUseCase.addPlugin(pluginName).fold(
             // 失敗時の処理
             { errorMessage ->
-                sender.sendMessage(
-                    Component.text(errorMessage, NamedTextColor.RED)
-                )
+                sender.sendRichMessage("<red>$errorMessage")
             },
             // 成功時の処理
             {
-                sender.sendMessage(
-                    Component.text("プラグイン '$pluginName' の情報を追加しました。", NamedTextColor.GREEN)
-                )
-                sender.sendMessage(
-                    Component.text("プラグイン '$pluginName' をインストールしています...", NamedTextColor.GRAY)
-                )
+                sender.sendRichMessage("<green>プラグイン '$pluginName' の情報を追加しました。")
+                sender.sendRichMessage("<gray>プラグイン '$pluginName' をインストールしています...")
+
                 pluginInstallUseCase.installPlugin(pluginName).fold(
                     { errorMessage ->
-                        sender.sendMessage(
-                            Component.text(errorMessage, NamedTextColor.RED)
-                        )
+                        sender.sendRichMessage("<red>$errorMessage")
                     },
-                    {
-                        sender.sendMessage(
-                            Component.text("プラグイン '$pluginName' をインストールしました。", NamedTextColor.GREEN)
-                        )
-                        sender.sendMessage(
-                            Component.text("変更を反映するには、サーバーを再起動してください。", NamedTextColor.GRAY)
-                        )
+                    { installResult ->
+                        // 削除されたプラグイン情報を表示
+                        installResult.removed?.let { removedInfo ->
+                            sender.sendRichMessage("<red>-<reset> ${removedInfo.name} <gray>${removedInfo.version}")
+                        }
+
+                        // インストールされたプラグイン情報を表示
+                        val versionInfo =
+                            if (installResult.installed.latestVersion.isEmpty() ||
+                                installResult.installed.currentVersion == installResult.installed.latestVersion
+                            ) {
+                                installResult.installed.currentVersion
+                            } else {
+                                "${installResult.installed.currentVersion} (${installResult.installed.latestVersion}が有効)"
+                            }
+                        sender.sendRichMessage("<green>+<reset> ${installResult.installed.name} <gray>$versionInfo")
+
+                        sender.sendRichMessage("<gray>変更を反映するには、サーバーを再起動してください。")
                     }
                 )
             }

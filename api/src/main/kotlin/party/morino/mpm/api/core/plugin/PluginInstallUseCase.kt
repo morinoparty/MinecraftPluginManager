@@ -14,5 +14,5 @@ package party.morino.mpm.api.core.plugin
 import arrow.core.Either
 
 interface PluginInstallUseCase {
-    suspend fun installPlugin(pluginName: String): Either<String, Unit>
+    suspend fun installPlugin(pluginName: String): Either<String, InstallResult>
 }

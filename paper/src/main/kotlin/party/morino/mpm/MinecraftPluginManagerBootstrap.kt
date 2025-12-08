@@ -21,8 +21,8 @@ import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 import org.incendo.cloud.paper.PaperCommandManager
 import party.morino.mpm.ui.commands.manage.AddCommand
 import party.morino.mpm.ui.commands.manage.InitCommand
+import party.morino.mpm.ui.commands.manage.InstallCommand
 import party.morino.mpm.ui.commands.manage.ListCommand
-import party.morino.mpm.ui.commands.manage.ManageCommands
 import party.morino.mpm.ui.commands.manage.UninstallCommand
 import party.morino.mpm.ui.commands.repo.RepositoryCommands
 import party.morino.mpm.utils.CommandSenderMapper
@@ -53,7 +53,7 @@ class MinecraftPluginManagerBootstrap : PluginBootstrap {
         // コマンドの登録
         with(annotationParser) {
             parse(
-                ManageCommands(),
+                InstallCommand(),
                 AddCommand(),
                 UninstallCommand(),
                 ListCommand(),

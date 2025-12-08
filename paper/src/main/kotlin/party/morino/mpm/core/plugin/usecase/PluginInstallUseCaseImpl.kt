@@ -7,9 +7,10 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.core.plugin
+package party.morino.mpm.core.plugin.usecase
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import com.charleskorn.kaml.Yaml
@@ -18,10 +19,14 @@ import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.config.plugin.ManagedPlugin
 import party.morino.mpm.api.core.plugin.DownloaderRepository
+import party.morino.mpm.api.core.plugin.InstallResult
+import party.morino.mpm.api.core.plugin.PluginInstallInfo
 import party.morino.mpm.api.core.plugin.PluginInstallUseCase
+import party.morino.mpm.api.core.plugin.PluginMetadataManager
+import party.morino.mpm.api.core.plugin.PluginRemovalInfo
 import party.morino.mpm.api.model.repository.UrlData
 import party.morino.mpm.api.model.repository.VersionData
-import party.morino.mpm.api.utils.DataClassReplacer.replaceTemplate
+import party.morino.mpm.utils.DataClassReplacer.replaceTemplate
 import java.io.File
 
 class PluginInstallUseCaseImpl :
@@ -29,8 +34,9 @@ class PluginInstallUseCaseImpl :
     KoinComponent {
     private val pluginDirectory: PluginDirectory by inject()
     private val downloaderRepository: DownloaderRepository by inject()
+    private val metadataManager: PluginMetadataManager by inject()
 
-    override suspend fun installPlugin(pluginName: String): Either<String, Unit> {
+    override suspend fun installPlugin(pluginName: String): Either<String, InstallResult> {
         val metadataDir = pluginDirectory.getMetadataDirectory()
         val metadataFile = File(metadataDir, "$pluginName.yaml")
 
@@ -84,10 +90,27 @@ class PluginInstallUseCaseImpl :
         }
 
         val template = mpmInfo.fileNameTemplate ?: "<pluginInfo.name>-<mpmInfo.version.current.normalized>.jar"
-        val fileName = generateFileName(template, pluginInfo.name, mpmInfo.version.current.normalized)
+        val newFileName = generateFileName(template, pluginInfo.name, mpmInfo.version.current.normalized)
+
+        // 古いファイルを削除（存在する場合）
+        val oldFileName = mpmInfo.download.fileName
+        var removedInfo: PluginRemovalInfo? = null
+        if (oldFileName != null && oldFileName != newFileName) {
+            val pluginsDir = pluginDirectory.getPluginsDirectory()
+            val oldFile = File(pluginsDir, oldFileName)
+            if (oldFile.exists()) {
+                oldFile.delete()
+                // 削除されたファイル情報を記録
+                removedInfo =
+                    PluginRemovalInfo(
+                        name = pluginName,
+                        version = mpmInfo.version.current.normalized
+                    )
+            }
+        }
 
         val pluginsDir = pluginDirectory.getPluginsDirectory()
-        val targetFile = File(pluginsDir, fileName)
+        val targetFile = File(pluginsDir, newFileName)
         try {
             downloadedFile.copyTo(targetFile, overwrite = true)
             downloadedFile.delete()
@@ -95,7 +118,31 @@ class PluginInstallUseCaseImpl :
             return "プラグインファイルの移動に失敗しました: ${e.message}".left()
         }
 
-        return Unit.right()
+        // ファイル名をmetadataに記録して保存
+        val updatedMetadata =
+            metadata.copy(
+                mpmInfo =
+                    metadata.mpmInfo.copy(
+                        download =
+                            metadata.mpmInfo.download.copy(
+                                fileName = newFileName
+                            )
+                    )
+            )
+        metadataManager.saveMetadata(pluginName, updatedMetadata).getOrElse { return it.left() }
+
+        // インストール結果を返す
+        val installInfo =
+            PluginInstallInfo(
+                name = pluginName,
+                currentVersion = metadata.mpmInfo.version.current.raw,
+                latestVersion = metadata.mpmInfo.version.latest.raw
+            )
+
+        return InstallResult(
+            installed = installInfo,
+            removed = removedInfo
+        ).right()
     }
 
     private fun generateFileName(

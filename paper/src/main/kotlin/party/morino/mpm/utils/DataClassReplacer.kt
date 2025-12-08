@@ -28,7 +28,6 @@ object DataClassReplacer {
             if (isDataClass(value)) {
                 replaced = replaceFields(replaced, value!!, name)
             } else {
-                println("<$name>は${value}に置換されます")
                 replaced = replaced.replace("<$name>", value.toString())
             }
         }

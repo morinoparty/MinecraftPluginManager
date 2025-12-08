@@ -1,8 +1,8 @@
 import { readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const pluginsDir = join(__dirname, '..', 'public', 'plugins');
-const outputFile = join(__dirname, '..', 'public', '_list.json');
+const pluginsDir = join(__dirname, '..', 'public', "paper", 'plugins');
+const outputFile = join(__dirname, '..', 'public', "paper", '_list.json');
 
 const files = readdirSync(pluginsDir)
   .filter(file => file.endsWith('.json'))

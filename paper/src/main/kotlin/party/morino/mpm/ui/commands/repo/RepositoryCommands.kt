@@ -89,8 +89,10 @@ class RepositoryCommands : KoinComponent {
             when (urlData) {
                 is party.morino.mpm.api.model.repository.UrlData.GithubUrlData ->
                     "${urlData.owner}/${urlData.repository}"
+
                 is party.morino.mpm.api.model.repository.UrlData.SpigotMcUrlData ->
                     urlData.resourceId
+
                 is party.morino.mpm.api.model.repository.UrlData.ModrinthUrlData -> urlData.id
                 else -> {
                     sender.sendMessage("未対応のリポジトリタイプです")

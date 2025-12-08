@@ -7,8 +7,9 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.core.plugin
+package party.morino.mpm.core.plugin.infrastructure
 
+import com.charleskorn.kaml.Yaml
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
+import party.morino.mpm.api.config.plugin.ManagedPlugin
 import party.morino.mpm.api.core.plugin.PluginRepository
 import party.morino.mpm.api.model.plugin.PluginData
 import java.io.File
@@ -61,7 +63,18 @@ class PluginRepositoryImpl :
 
             try {
                 val content = metadataFile.readText()
-                json.decodeFromString<PluginData>(content)
+                // ManagedPluginをYAMLから読み込む
+                val managedPlugin = Yaml.default.decodeFromString(ManagedPlugin.serializer(), content)
+                // ManagedPluginからPluginDataに変換
+                PluginData.BukkitPluginData(
+                    name = managedPlugin.pluginInfo.name,
+                    version = managedPlugin.pluginInfo.version,
+                    description = managedPlugin.pluginInfo.description ?: "",
+                    main = managedPlugin.pluginInfo.main ?: "",
+                    author = managedPlugin.pluginInfo.author ?: "",
+                    website = managedPlugin.pluginInfo.website ?: "",
+                    apiVersion = ""
+                )
             } catch (e: Exception) {
                 plugin.logger.warning("プラグイン $name のメタデータの読み込みに失敗しました: ${e.message}")
                 null
@@ -76,11 +89,23 @@ class PluginRepositoryImpl :
         withContext(Dispatchers.IO) {
             val plugins = mutableListOf<PluginData>()
 
-            metadataDir.listFiles()?.filter { it.extension == "json" }?.forEach { file ->
+            metadataDir.listFiles()?.filter { it.extension == "yaml" }?.forEach { file ->
                 try {
                     val content = file.readText()
-                    val plugin = json.decodeFromString<PluginData>(content)
-                    plugins.add(plugin)
+                    // ManagedPluginをYAMLから読み込む
+                    val managedPlugin = Yaml.default.decodeFromString(ManagedPlugin.serializer(), content)
+                    // ManagedPluginからPluginDataに変換
+                    val pluginData =
+                        PluginData.BukkitPluginData(
+                            name = managedPlugin.pluginInfo.name,
+                            version = managedPlugin.pluginInfo.version,
+                            description = managedPlugin.pluginInfo.description ?: "",
+                            main = managedPlugin.pluginInfo.main ?: "",
+                            author = managedPlugin.pluginInfo.author ?: "",
+                            website = managedPlugin.pluginInfo.website ?: "",
+                            apiVersion = ""
+                        )
+                    plugins.add(pluginData)
                 } catch (e: Exception) {
                     this@PluginRepositoryImpl.plugin.logger.warning(
                         "プラグイン ${file.nameWithoutExtension} のメタデータの読み込みに失敗しました: ${e.message}"
@@ -133,7 +158,7 @@ class PluginRepositoryImpl :
             }
 
             // メタデータファイルの削除
-            val metadataFile = File(metadataDir, "$name.json")
+            val metadataFile = File(metadataDir, "$name.yaml")
             if (metadataFile.exists()) {
                 success = success && metadataFile.delete()
             }
