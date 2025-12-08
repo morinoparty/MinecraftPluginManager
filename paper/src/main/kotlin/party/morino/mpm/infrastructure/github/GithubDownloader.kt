@@ -64,6 +64,32 @@ open class GithubDownloader : AbstractPluginDownloader() {
     }
 
     /**
+     * 指定されたバージョン名からバージョン情報を取得
+     * @param urlData GitHubのURL情報
+     * @param versionName バージョン名（tag_name）
+     * @return バージョン情報
+     */
+    override suspend fun getVersionByName(
+        urlData: UrlData,
+        versionName: String
+    ): VersionData {
+        urlData as UrlData.GithubUrlData
+        // 指定されたタグのリリース情報を取得
+        val url = "https://api.github.com/repos/${urlData.owner}/${urlData.repository}/releases/tags/$versionName"
+        val response =
+            try {
+                getRequest(url, "application/vnd.github+json")
+            } catch (e: Exception) {
+                throw Exception("バージョン '$versionName' が見つかりませんでした: ${e.message}")
+            }
+        val responseJson = json.parseToJsonElement(response).jsonObject
+        // githubのダウンロードではidを利用しない
+        val id = responseJson["id"]?.jsonPrimitive?.content ?: "unknown"
+        val tagName = responseJson["tag_name"]?.jsonPrimitive?.content ?: "unknown"
+        return VersionData(downloadId = id, version = tagName)
+    }
+
+    /**
      * 指定バージョンのプラグインをダウンロード
      * @param urlData GitHubのURL情報
      * @param version バージョン名

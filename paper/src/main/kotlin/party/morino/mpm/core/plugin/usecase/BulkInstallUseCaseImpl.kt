@@ -149,20 +149,26 @@ class BulkInstallUseCaseImpl :
                 }
             }
 
-        // 指定バージョンを取得
-        val versionData =
+        // 最新バージョンを取得
+        val latestVersionData =
             try {
-                if (expectedVersion == "latest") {
-                    // 最新バージョンを取得
-                    downloaderRepository.getLatestVersion(urlData)
-                } else {
-                    // 特定のバージョンを取得（簡易的に最新バージョンを取得し、expectedVersionを使用）
-                    // TODO: 将来的には特定バージョンの取得APIを実装する
-                    val latestVersion = downloaderRepository.getLatestVersion(urlData)
-                    latestVersion.copy(version = expectedVersion)
-                }
+                downloaderRepository.getLatestVersion(urlData)
             } catch (e: Exception) {
                 return "バージョン情報の取得に失敗しました: ${e.message}".left()
+            }
+
+        // 指定バージョンを取得
+        val versionData =
+            if (expectedVersion == "latest") {
+                // 最新バージョンをそのまま使用
+                latestVersionData
+            } else {
+                // 特定のバージョンを取得（正しいdownloadIdを含む）
+                try {
+                    downloaderRepository.getVersionByName(urlData, expectedVersion)
+                } catch (e: Exception) {
+                    return "指定されたバージョン '$expectedVersion' の取得に失敗しました: ${e.message}".left()
+                }
             }
 
         // メタデータが存在するか確認し、更新または作成
@@ -177,7 +183,7 @@ class BulkInstallUseCaseImpl :
                 // メタデータが存在する場合は更新
                 {
                     metadataManager
-                        .updateMetadata(pluginName, versionData, "install")
+                        .updateMetadata(pluginName, versionData, latestVersionData, "install")
                         .getOrElse { return it.left() }
                 }
             )

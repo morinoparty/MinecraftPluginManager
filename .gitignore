@@ -125,3 +125,5 @@ bin/
 !.idea/copyright/
 
 **/node_modules
+
+**/.wrangler

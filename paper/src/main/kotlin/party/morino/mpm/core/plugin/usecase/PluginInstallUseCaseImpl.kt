@@ -71,8 +71,22 @@ class PluginInstallUseCaseImpl :
                 else -> return "未対応のリポジトリタイプです: ${repositoryInfo.type.name}".left()
             }
 
+        // 最新バージョンを取得
+        val latestVersionData =
+            try {
+                downloaderRepository.getLatestVersion(urlData)
+            } catch (e: Exception) {
+                return "最新バージョン情報の取得に失敗しました: ${e.message}".left()
+            }
+
         // メタデータからバージョン情報を作成
         val versionData = VersionData(mpmInfo.download.downloadId, mpmInfo.version.current.raw)
+
+        // metadataを更新（最新バージョン情報を反映）
+        val updatedMetadataWithLatest =
+            metadataManager
+                .updateMetadata(pluginName, versionData, latestVersionData, "install")
+                .getOrElse { return it.left() }
 
         val downloadedFile =
             try {
@@ -120,11 +134,11 @@ class PluginInstallUseCaseImpl :
 
         // ファイル名をmetadataに記録して保存
         val updatedMetadata =
-            metadata.copy(
+            updatedMetadataWithLatest.copy(
                 mpmInfo =
-                    metadata.mpmInfo.copy(
+                    updatedMetadataWithLatest.mpmInfo.copy(
                         download =
-                            metadata.mpmInfo.download.copy(
+                            updatedMetadataWithLatest.mpmInfo.download.copy(
                                 fileName = newFileName
                             )
                     )
@@ -135,8 +149,8 @@ class PluginInstallUseCaseImpl :
         val installInfo =
             PluginInstallInfo(
                 name = pluginName,
-                currentVersion = metadata.mpmInfo.version.current.raw,
-                latestVersion = metadata.mpmInfo.version.latest.raw
+                currentVersion = updatedMetadata.mpmInfo.version.current.raw,
+                latestVersion = updatedMetadata.mpmInfo.version.latest.raw
             )
 
         return InstallResult(
