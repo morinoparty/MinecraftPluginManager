@@ -31,11 +31,13 @@ Spigot, Modrinth, Hanger, GitHubといった複数のプラットフォームか
 
 ## 実装手順
 
-1. **型設計**
+1. 型設計
    - まず型(interface)を定義
-
-2. **純粋関数から実装**
+2. 純粋関数から実装
    - 外部依存のない関数を先に実装
+3. 実装を記述
+4. 必要があればinterfaceをKoinに登録
+5. ドキュメントを変更
 
 ## プラクティス
 
@@ -43,8 +45,6 @@ Spigot, Modrinth, Hanger, GitHubといった複数のプラットフォームか
 - 過度な抽象化を避ける
 - コードよりも型を重視
 - 複雑さに応じてアプローチを調整
-
-
 
 ## コードスタイル
 
@@ -79,15 +79,6 @@ Spigot, Modrinth, Hanger, GitHubといった複数のプラットフォームか
 - 上記の理由から、docs/src/components/ui/は触れないでください。
 
 
-## ディレクトリ配置規則
-
-- docs/docs/ にドキュメントを配置します。
-- app/src/main/kotlin/party/morino/mpm/ にプラグインのメインクラスを配置します。
-- api/src/main/kotlin/party/morino/mpm/api/ にAPIのインターフェースを配置します。
-- data classはそれぞれのmodelに配置します。
-- 一つのファイルに一つのクラスを配置します。
-
-
 # Gitのルール
 
 ## Repository
@@ -112,6 +103,15 @@ commitの絵文字などに関しては、changelog.config.jsを参考にして�
 - Issueは英語で書き、適切なラベルを追加してください。
 - 現状存在しないラベルについては、勝手に作成しないでください
 - どうしても必要である場合は、.github/labels.jsonに追加してください
+
+
+## ディレクトリ配置規則
+
+- docs/docs/ にドキュメントを配置します。
+- app/src/main/kotlin/party/morino/mpm/ にプラグインのメインクラスを配置します。
+- api/src/main/kotlin/party/morino/mpm/api/ にAPIのインターフェースを配置します。
+- data classはそれぞれのmodelに配置します。
+- 一つのファイルに一つのクラスを配置します。
 
 
 # 推奨される書き方

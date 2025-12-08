@@ -19,5 +19,7 @@ class PluginDirectoryMock : PluginDirectory {
 
     override fun getPluginsDirectory(): File = rootDirectory.parentFile
 
+    override fun getMetadataDirectory(): File = rootDirectory.resolve("metadata")
+
     override fun getRepositoryDirectory(): File = rootDirectory.resolve("repository")
 }

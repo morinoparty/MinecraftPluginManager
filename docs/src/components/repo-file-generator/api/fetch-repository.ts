@@ -98,7 +98,7 @@ export const fetchModrinthData = async (
                     id: project.id || slug,
                     fileNameRegex: ".*\\.jar$",
                     versionModifier:
-                        "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+                        "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)",
                 },
             ],
         },
@@ -141,7 +141,7 @@ export const fetchSpigotData = async (
                     id: id,
                     fileNameRegex: ".*\\.jar$",
                     versionModifier:
-                        "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+                        "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)",
                 },
             ],
         },
@@ -191,7 +191,7 @@ export const fetchGitHubData = async (
                     id: ownerRepo,
                     fileNameRegex: ".*\\.jar$",
                     versionModifier:
-                        "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+                        "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)",
                 },
             ],
         },
@@ -239,7 +239,7 @@ export const fetchHangarData = async (
                     id: authorSlug,
                     fileNameRegex: ".*\\.jar$",
                     versionModifier:
-                        "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+                        "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)",
                 },
             ],
         },

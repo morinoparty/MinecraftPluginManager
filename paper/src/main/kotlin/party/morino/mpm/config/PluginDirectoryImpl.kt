@@ -9,11 +9,11 @@
 
 package party.morino.mpm.config
 
+import java.io.File
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
-import java.io.File
 
 /**
  * プラグインのディレクトリを管理する実装クラス
@@ -31,6 +31,7 @@ class PluginDirectoryImpl : PluginDirectory, KoinComponent {
 
     // プラグインをインストールするためのデータを保存するディレクトリをlazyで初期化
     private val repositoryDirectoryFile: File by lazy { File(rootDirectoryFile, "repository") }
+    private val metadataDirectoryFile: File by lazy { File(rootDirectoryFile, "metadata") }
 
     /**
      * プラグインのルートディレクトリを取得する
@@ -56,6 +57,19 @@ class PluginDirectoryImpl : PluginDirectory, KoinComponent {
             pluginsDirectoryFile.mkdirs()
         }
         return pluginsDirectoryFile
+    }
+
+    /**
+     * メタデータディレクトリを取得する
+     * ディレクトリが存在しない場合は作成する
+     * @return メタデータディレクトリ
+     */
+    override fun getMetadataDirectory(): File {
+        // ディレクトリが存在しない場合は作成
+        if (!metadataDirectoryFile.exists()) {
+            metadataDirectoryFile.mkdirs()
+        }
+        return metadataDirectoryFile
     }
 
     /**

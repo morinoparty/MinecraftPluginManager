@@ -17,13 +17,14 @@ import java.util.jar.JarFile
 object PluginDataUtils {
     fun getPluginData(file: File): PluginData? {
         val jarFile = JarFile(file)
-        val pluginYml = jarFile.getEntry("plugin.yml")
-        if (pluginYml != null) {
-            return getBukkitPluginData(jarFile)
-        }
+        // paper-plugin.ymlを先にチェック（Paperプラグインの場合、両方存在する可能性があるため）
         val paperYml = jarFile.getEntry("paper-plugin.yml")
         if (paperYml != null) {
             return getPaperPluginData(jarFile)
+        }
+        val pluginYml = jarFile.getEntry("plugin.yml")
+        if (pluginYml != null) {
+            return getBukkitPluginData(jarFile)
         }
         return null
     }

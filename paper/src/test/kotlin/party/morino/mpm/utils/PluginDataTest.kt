@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import party.morino.mpm.api.model.plugin.PluginData
-import party.morino.mpm.api.utils.PluginDataUtils
+import party.morino.mpm.utils.PluginDataUtils
 import java.io.File
 
 class PluginDataTest {

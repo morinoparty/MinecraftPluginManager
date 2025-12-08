@@ -28,6 +28,12 @@ interface PluginDirectory {
     fun getPluginsDirectory(): File
 
     /**
+     * メタデータディレクトリを取得する
+     * @return メタデータディレクトリ
+     */
+    fun getMetadataDirectory(): File
+
+    /**
      * レポジトリのデータディレクトリを取得する
      * @return レポジトリのデータディレクトリ
      */

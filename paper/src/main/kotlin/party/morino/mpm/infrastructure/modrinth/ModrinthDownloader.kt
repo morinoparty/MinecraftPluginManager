@@ -67,9 +67,10 @@ open class ModrinthDownloader : AbstractPluginDownloader() {
     override suspend fun getLatestVersion(urlData: UrlData): VersionData {
         urlData as UrlData.ModrinthUrlData
         // Modrinthのバージョン一覧APIを呼び出す
-        // loaders=["paper", "spigot"]でフィルタリングする
-        val url =
-            "https://api.modrinth.com/v2/project/${urlData.id}/version?loaders=[\"paper\", \"spigot\"]"
+        // loaders=["paper","spigot"]でフィルタリングする
+        // URLエンコードが必要な特殊文字を含むため、手動でエンコード
+        val loadersParam = java.net.URLEncoder.encode("[\"paper\",\"spigot\"]", "UTF-8")
+        val url = "https://api.modrinth.com/v2/project/${urlData.id}/version?loaders=$loadersParam"
         val response = getRequest(url, "application/json")
         val versions = json.decodeFromString<List<ModrinthVersion>>(response)
 
@@ -80,6 +81,31 @@ open class ModrinthDownloader : AbstractPluginDownloader() {
         // 最初のバージョン（最新版）を返す
         val latestVersion = versions[0]
         return VersionData(downloadId = latestVersion.id, version = latestVersion.versionNumber)
+    }
+
+    /**
+     * 指定されたバージョン名からバージョン情報を取得
+     * @param urlData ModrinthのURL情報
+     * @param versionName バージョン名
+     * @return バージョン情報
+     */
+    override suspend fun getVersionByName(
+        urlData: UrlData,
+        versionName: String
+    ): VersionData {
+        urlData as UrlData.ModrinthUrlData
+        // Modrinthのバージョン一覧APIを呼び出す
+        val loadersParam = java.net.URLEncoder.encode("[\"paper\",\"spigot\"]", "UTF-8")
+        val url = "https://api.modrinth.com/v2/project/${urlData.id}/version?loaders=$loadersParam"
+        val response = getRequest(url, "application/json")
+        val versions = json.decodeFromString<List<ModrinthVersion>>(response)
+
+        // 指定されたバージョン名に一致するバージョンを探す
+        val matchedVersion =
+            versions.firstOrNull { it.versionNumber == versionName }
+                ?: throw Exception("バージョン '$versionName' が見つかりませんでした")
+
+        return VersionData(downloadId = matchedVersion.id, version = matchedVersion.versionNumber)
     }
 
     /**

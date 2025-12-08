@@ -15,7 +15,7 @@ const RepositorySchema = z.object({
     fileNameRegex: z.string(),
     versionModifier: z
         .string()
-        .default("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$")
+        .default("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)")
         .optional(),
     downloadUrl: z.string().optional(),
     fileNameTemplate: z.string().optional(),

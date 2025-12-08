@@ -7,7 +7,7 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-package party.morino.mpm.core.plugin
+package party.morino.mpm.core.plugin.infrastructure
 
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
@@ -17,9 +17,9 @@ import party.morino.mpm.api.model.repository.RepositoryType
 import party.morino.mpm.api.model.repository.UrlData
 import party.morino.mpm.api.model.repository.VersionData
 import party.morino.mpm.infrastructure.github.GithubDownloader
-import party.morino.mpm.infrastructure.modrinth.ModrinthDownloader
 import party.morino.mpm.infrastructure.spigot.SpigotDownloader
 import java.io.File
+import party.morino.mpm.infrastructure.modrinth.ModrinthDownloader
 
 /**
  * DownloaderRepositoryの実装クラス
@@ -93,15 +93,47 @@ class DownloaderRepositoryImpl :
             is UrlData.GithubUrlData -> {
                 GithubDownloader().getLatestVersion(urlData)
             }
+
             is UrlData.SpigotMcUrlData -> {
                 SpigotDownloader().getLatestVersion(urlData)
             }
+
             is UrlData.ModrinthUrlData -> {
                 ModrinthDownloader().getLatestVersion(urlData)
             }
+
             else -> {
                 // 他のリポジトリタイプの実装
                 VersionData("unknown", "unknown")
+            }
+        }
+
+    /**
+     * 指定されたバージョン名からバージョン情報を取得
+     * @param urlData URLデータ
+     * @param versionName バージョン名
+     * @return バージョン情報
+     */
+    override suspend fun getVersionByName(
+        urlData: UrlData,
+        versionName: String
+    ): VersionData =
+        when (urlData) {
+            is UrlData.GithubUrlData -> {
+                GithubDownloader().getVersionByName(urlData, versionName)
+            }
+
+            is UrlData.SpigotMcUrlData -> {
+                SpigotDownloader().getVersionByName(urlData, versionName)
+            }
+
+            is UrlData.ModrinthUrlData -> {
+                ModrinthDownloader().getVersionByName(urlData, versionName)
+            }
+
+            else -> {
+                // 他のリポジトリタイプの実装
+                throw Exception("未対応のリポジトリタイプです")
             }
         }
 
@@ -121,12 +153,15 @@ class DownloaderRepositoryImpl :
             is UrlData.GithubUrlData -> {
                 GithubDownloader().downloadByVersion(urlData, version, fileNamePattern)
             }
+
             is UrlData.SpigotMcUrlData -> {
                 SpigotDownloader().downloadByVersion(urlData, version, fileNamePattern)
             }
+
             is UrlData.ModrinthUrlData -> {
                 ModrinthDownloader().downloadByVersion(urlData, version, fileNamePattern)
             }
+
             else -> {
                 // 他のリポジトリタイプの実装
                 null

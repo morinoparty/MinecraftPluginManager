@@ -41,6 +41,17 @@ interface DownloaderRepository {
     suspend fun getLatestVersion(urlData: UrlData): VersionData
 
     /**
+     * 指定されたバージョン名からバージョン情報を取得
+     * @param urlData URLデータ
+     * @param versionName バージョン名（例: "v5.5.15-bukkit", "1.0.0" など）
+     * @return バージョン情報、見つからない場合は例外をスロー
+     */
+    suspend fun getVersionByName(
+        urlData: UrlData,
+        versionName: String
+    ): VersionData
+
+    /**
      * 指定バージョンのプラグインをダウンロード
      * @param urlData URLデータ
      * @param version バージョン

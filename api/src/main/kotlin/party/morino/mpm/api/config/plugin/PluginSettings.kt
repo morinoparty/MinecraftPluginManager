@@ -20,11 +20,5 @@ data class PluginSettings(
     val lock: Boolean = false,
 
     // 自動更新を有効にするか（将来実装予定）
-    val autoUpdate: Boolean = false,
-
-    // カスタムダウンロードURL（オプション）
-    val downloadUrl: String? = null,
-
-    // カスタムファイル名（オプション）
-    val fileName: String? = null,
+    val autoUpdate: Boolean = false
 )

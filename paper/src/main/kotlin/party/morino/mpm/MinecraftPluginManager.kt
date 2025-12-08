@@ -13,17 +13,27 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import party.morino.mpm.api.config.PluginDirectory
+import party.morino.mpm.api.core.plugin.AddPluginUseCase
+import party.morino.mpm.api.core.plugin.BulkInstallUseCase
 import party.morino.mpm.api.core.plugin.DownloaderRepository
 import party.morino.mpm.api.core.plugin.InitUseCase
 import party.morino.mpm.api.core.plugin.PluginInstallUseCase
 import party.morino.mpm.api.core.plugin.PluginListUseCase
+import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.plugin.PluginRepository
+import party.morino.mpm.api.core.plugin.UninstallPluginUseCase
+import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
 import party.morino.mpm.config.PluginDirectoryImpl
-import party.morino.mpm.core.plugin.DownloaderRepositoryImpl
-import party.morino.mpm.core.plugin.InitUseCaseImpl
-import party.morino.mpm.core.plugin.PluginInstallUseCaseImpl
-import party.morino.mpm.core.plugin.PluginListUseCaseImpl
-import party.morino.mpm.core.plugin.PluginRepositoryImpl
+import party.morino.mpm.core.plugin.infrastructure.DownloaderRepositoryImpl
+import party.morino.mpm.core.plugin.infrastructure.PluginMetadataManagerImpl
+import party.morino.mpm.core.plugin.infrastructure.PluginRepositoryImpl
+import party.morino.mpm.core.plugin.usecase.AddPluginUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.BulkInstallUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.InitUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.PluginInstallUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.PluginListUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.UninstallPluginUseCaseImpl
+import party.morino.mpm.core.repository.RepositorySourceManagerFactory
 
 /**
  * MinecraftPluginManagerのメインクラス
@@ -63,14 +73,25 @@ open class MinecraftPluginManager : JavaPlugin() {
                 // 設定の登録（依存性はKoinのinjectによって自動注入される）
                 single<PluginDirectory> { PluginDirectoryImpl() }
 
+                // リポジトリソースマネージャーの登録（ファクトリーを使用）
+                single<PluginRepositorySourceManager> {
+                    RepositorySourceManagerFactory.create(get())
+                }
+
                 // リポジトリの登録（依存性はKoinのinjectによって自動注入される）
                 single<DownloaderRepository> { DownloaderRepositoryImpl() }
                 single<PluginRepository> { PluginRepositoryImpl() }
 
+                // メタデータマネージャーの登録（依存性はKoinのinjectによって自動注入される）
+                single<PluginMetadataManager> { PluginMetadataManagerImpl() }
+
                 // ユースケースの登録（依存性はKoinのinjectによって自動注入される）
                 single<InitUseCase> { InitUseCaseImpl() }
+                single<AddPluginUseCase> { AddPluginUseCaseImpl() }
+                single<UninstallPluginUseCase> { UninstallPluginUseCaseImpl() }
                 single<PluginInstallUseCase> { PluginInstallUseCaseImpl() }
                 single<PluginListUseCase> { PluginListUseCaseImpl() }
+                single<BulkInstallUseCase> { BulkInstallUseCaseImpl() }
             }
 
         // Koinの開始（すでに開始されている場合は何もしない）

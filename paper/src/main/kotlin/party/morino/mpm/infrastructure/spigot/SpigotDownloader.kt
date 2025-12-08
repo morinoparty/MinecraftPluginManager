@@ -74,6 +74,42 @@ open class SpigotDownloader : AbstractPluginDownloader() {
     }
 
     /**
+     * 指定されたバージョン名からバージョン情報を取得
+     * @param urlData SpigotMCのURL情報
+     * @param versionName バージョン名
+     * @return バージョン情報
+     */
+    override suspend fun getVersionByName(
+        urlData: UrlData,
+        versionName: String
+    ): VersionData {
+        urlData as UrlData.SpigotMcUrlData
+        // 全バージョンを取得（size制限なし）
+        val url = "https://api.spiget.org/v2/resources/${urlData.resourceId}/versions?sort=-name"
+        val response =
+            try {
+                getRequest(url, "application/json")
+            } catch (e: Exception) {
+                throw Exception("バージョン情報の取得に失敗しました: ${e.message}")
+            }
+        val versions = json.parseToJsonElement(response).jsonArray
+
+        // 指定されたバージョン名に一致するバージョンを探す
+        val matchingVersion =
+            versions.firstOrNull { versionElement ->
+                val name = versionElement.jsonObject["name"]?.jsonPrimitive?.content ?: ""
+                name == versionName
+            }
+        val matchedVersion =
+            matchingVersion?.jsonObject
+                ?: throw Exception("バージョン '$versionName' が見つかりませんでした")
+
+        val version = matchedVersion["name"]?.jsonPrimitive?.content ?: "unknown"
+        val id = matchedVersion["id"]?.jsonPrimitive?.content ?: "unknown"
+        return VersionData(downloadId = id, version = version)
+    }
+
+    /**
      * 指定バージョンのプラグインをダウンロード
      * @param urlData URLデータ
      * @param version バージョン

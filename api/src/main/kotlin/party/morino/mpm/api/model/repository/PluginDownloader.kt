@@ -1,7 +1,9 @@
 /*
  * Written in 2023-2025 by Nikomaru <nikomaru@nikomaru.dev>
  *
- * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide.This software is distributed without any warranty.
+ * To the extent possible under law, the author(s) have dedicated all copyright
+and related and neighboring rights to this software to the public domain worldwide.
+This software is distributed without any warranty.
  *
  * You should have received a copy of the CC0 Public Domain Dedication along with this software.
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
@@ -36,6 +38,17 @@ interface PluginDownloader {
      * @return 最新バージョン
      */
     suspend fun getLatestVersion(urlData: UrlData): VersionData
+
+    /**
+     * 指定されたバージョン名からバージョン情報を取得
+     * @param urlData URLデータ
+     * @param versionName バージョン名（例: "v5.5.15-bukkit", "1.0.0" など）
+     * @return バージョン情報、見つからない場合は例外をスロー
+     */
+    suspend fun getVersionByName(
+        urlData: UrlData,
+        versionName: String
+    ): VersionData
 
     /**
      * 指定バージョンのプラグインをダウンロード

@@ -8,13 +8,13 @@
       "type": "modrinth",
       "id": "Vebnzrzj",
       "fileNameRegex": ".*\\.jar$",
-      "versionModifier": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+      "versionModifier": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)"
     },
     {
       "type": "spigot",
       "id": "28140",
       "fileNameRegex": "",
-      "versionModifier": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+      "versionModifier": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)"
     }
   ]
 }

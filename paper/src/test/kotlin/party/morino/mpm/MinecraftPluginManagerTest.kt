@@ -18,8 +18,17 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import party.morino.mpm.api.config.PluginDirectory
+import party.morino.mpm.api.core.plugin.DownloaderRepository
+import party.morino.mpm.api.core.plugin.InitUseCase
+import party.morino.mpm.api.core.plugin.PluginInstallUseCase
+import party.morino.mpm.api.core.plugin.PluginListUseCase
+import party.morino.mpm.api.core.plugin.PluginRepository
+import party.morino.mpm.core.plugin.infrastructure.DownloaderRepositoryImpl
+import party.morino.mpm.core.plugin.infrastructure.PluginRepositoryImpl
+import party.morino.mpm.core.plugin.usecase.InitUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.PluginInstallUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.PluginListUseCaseImpl
 import party.morino.mpm.mock.config.PluginDirectoryMock
-import kotlin.jvm.java
 
 class MinecraftPluginManagerTest :
     BeforeEachCallback,
@@ -53,27 +62,22 @@ class MinecraftPluginManagerTest :
                 single<PluginDirectory> { PluginDirectoryMock() }
 
                 // リポジトリの登録
-                single<party.morino.mpm.api.core.plugin.DownloaderRepository> {
-                    party.morino.mpm.core.plugin
-                        .DownloaderRepositoryImpl()
+                single<DownloaderRepository> {
+                    DownloaderRepositoryImpl()
                 }
-                single<party.morino.mpm.api.core.plugin.PluginRepository> {
-                    party.morino.mpm.core.plugin
-                        .PluginRepositoryImpl()
+                single<PluginRepository> {
+                    PluginRepositoryImpl()
                 }
 
                 // ユースケースの登録
-                single<party.morino.mpm.api.core.plugin.InitUseCase> {
-                    party.morino.mpm.core.plugin
-                        .InitUseCaseImpl()
+                single<InitUseCase> {
+                    InitUseCaseImpl()
                 }
-                single<party.morino.mpm.api.core.plugin.PluginInstallUseCase> {
-                    party.morino.mpm.core.plugin
-                        .PluginInstallUseCaseImpl()
+                single<PluginInstallUseCase> {
+                    PluginInstallUseCaseImpl()
                 }
-                single<party.morino.mpm.api.core.plugin.PluginListUseCase> {
-                    party.morino.mpm.core.plugin
-                        .PluginListUseCaseImpl()
+                single<PluginListUseCase> {
+                    PluginListUseCaseImpl()
                 }
             }
 
