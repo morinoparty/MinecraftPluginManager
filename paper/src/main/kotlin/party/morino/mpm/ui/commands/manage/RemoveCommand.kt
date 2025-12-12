@@ -9,6 +9,7 @@
 
 package party.morino.mpm.ui.commands.manage
 
+import kotlin.collections.forEach
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.command.CommandSender
@@ -18,6 +19,7 @@ import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.core.plugin.RemovePluginUseCase
+import party.morino.mpm.api.core.plugin.RemoveUnmanagedUseCase
 
 /**
  * プラグイン削除コマンドのコントローラー
@@ -29,6 +31,7 @@ import party.morino.mpm.api.core.plugin.RemovePluginUseCase
 class RemoveCommand : KoinComponent {
     // Koinによる依存性注入
     private val removePluginUseCase: RemovePluginUseCase by inject()
+    private val removeUnmanagedUseCase : RemoveUnmanagedUseCase by inject()
 
     /**
      * プラグインを管理対象から除外するコマンド
@@ -60,6 +63,47 @@ class RemoveCommand : KoinComponent {
                     Component.text("ファイルも削除する場合は 'mpm uninstall $pluginName' を実行してください。", NamedTextColor.GRAY)
                 )
             }
+        )
+    }
+
+    /*
+    * mpm管理下にないプラグインを削除するコマンド
+    * @param sender コマンド送信者
+    */
+    @Command("removeUnmanaged")
+    suspend fun removeUnmanaged(sender: CommandSender) {
+        sender.sendMessage(
+                Component.text("管理外のプラグインを検索しています...", NamedTextColor.GRAY)
+        )
+
+        // ユースケースを実行
+        removeUnmanagedUseCase.removeUnmanaged().fold(
+                // 失敗時の処理
+                { errorMessage ->
+                    sender.sendMessage(
+                            Component.text(errorMessage, NamedTextColor.RED)
+                    )
+                },
+                // 成功時の処理
+                { removedPlugins ->
+                    if (removedPlugins.isEmpty()) {
+                        sender.sendMessage(
+                                Component.text("削除対象のプラグインはありませんでした。", NamedTextColor.YELLOW)
+                        )
+                    } else {
+                        sender.sendMessage(
+                                Component.text("以下のプラグインを削除しました:", NamedTextColor.GREEN)
+                        )
+                        removedPlugins.forEach { pluginName ->
+                            sender.sendMessage(
+                                    Component.text("  - $pluginName", NamedTextColor.WHITE)
+                            )
+                        }
+                        sender.sendMessage(
+                                Component.text("変更を反映するには、サーバーを再起動してください。", NamedTextColor.GRAY)
+                        )
+                    }
+                }
         )
     }
 }

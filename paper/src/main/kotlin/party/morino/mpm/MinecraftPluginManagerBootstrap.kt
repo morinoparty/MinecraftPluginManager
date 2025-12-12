@@ -23,7 +23,12 @@ import party.morino.mpm.ui.commands.manage.AddCommand
 import party.morino.mpm.ui.commands.manage.InitCommand
 import party.morino.mpm.ui.commands.manage.InstallCommand
 import party.morino.mpm.ui.commands.manage.ListCommand
+import party.morino.mpm.ui.commands.manage.LockCommand
+import party.morino.mpm.ui.commands.manage.OutdatedCommand
+import party.morino.mpm.ui.commands.manage.RemoveCommand
 import party.morino.mpm.ui.commands.manage.UninstallCommand
+import party.morino.mpm.ui.commands.manage.UpdateCommand
+import party.morino.mpm.ui.commands.manage.VersionsCommand
 import party.morino.mpm.ui.commands.repo.RepositoryCommands
 import party.morino.mpm.utils.CommandSenderMapper
 
@@ -33,6 +38,22 @@ import party.morino.mpm.utils.CommandSenderMapper
  */
 @Suppress("unused")
 class MinecraftPluginManagerBootstrap : PluginBootstrap {
+
+    private val commands = listOf(
+            AddCommand(),
+            InitCommand(),
+            InstallCommand(),
+            ListCommand(),
+            LockCommand(),
+            OutdatedCommand(),
+            RemoveCommand(),
+            UninstallCommand(),
+            UpdateCommand(),
+            VersionsCommand(),
+            RepositoryCommands(),
+
+            )
+
     /**
      * プラグインのブートストラップ処理を行うメソッド
      * コマンドマネージャーの設定とコマンドの登録を行う
@@ -41,10 +62,10 @@ class MinecraftPluginManagerBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
         // コマンドマネージャーのインスタンスを作成
         val commandManager: CommandManager<CommandSender> =
-            PaperCommandManager
-                .builder(CommandSenderMapper())
-                .executionCoordinator(ExecutionCoordinator.asyncCoordinator()) // 非同期実行コーディネーターを設定
-                .buildBootstrapped(context) // ブートストラップされたコマンドマネージャーを構築
+                PaperCommandManager
+                        .builder(CommandSenderMapper())
+                        .executionCoordinator(ExecutionCoordinator.asyncCoordinator()) // 非同期実行コーディネーターを設定
+                        .buildBootstrapped(context) // ブートストラップされたコマンドマネージャーを構築
 
         // アノテーションパーサーのインスタンスを作成
         val annotationParser = AnnotationParser(commandManager, CommandSender::class.java)
@@ -53,12 +74,7 @@ class MinecraftPluginManagerBootstrap : PluginBootstrap {
         // コマンドの登録
         with(annotationParser) {
             parse(
-                InstallCommand(),
-                AddCommand(),
-                UninstallCommand(),
-                ListCommand(),
-                RepositoryCommands(),
-                InitCommand()
+                    commands
             )
         }
     }

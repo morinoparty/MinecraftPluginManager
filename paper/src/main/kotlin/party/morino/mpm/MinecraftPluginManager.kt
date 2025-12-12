@@ -23,6 +23,7 @@ import party.morino.mpm.api.core.plugin.PluginInstallUseCase
 import party.morino.mpm.api.core.plugin.PluginListUseCase
 import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.plugin.PluginRepository
+import party.morino.mpm.api.core.plugin.PluginVersionsUseCase
 import party.morino.mpm.api.core.plugin.RemovePluginUseCase
 import party.morino.mpm.api.core.plugin.RemoveUnmanagedUseCase
 import party.morino.mpm.api.core.plugin.UninstallPluginUseCase
@@ -40,6 +41,7 @@ import party.morino.mpm.core.plugin.usecase.InitUseCaseImpl
 import party.morino.mpm.core.plugin.usecase.LockPluginUseCaseImpl
 import party.morino.mpm.core.plugin.usecase.PluginInstallUseCaseImpl
 import party.morino.mpm.core.plugin.usecase.PluginListUseCaseImpl
+import party.morino.mpm.core.plugin.usecase.PluginVersionsUseCaseImpl
 import party.morino.mpm.core.plugin.usecase.RemovePluginUseCaseImpl
 import party.morino.mpm.core.plugin.usecase.RemoveUnmanagedUseCaseImpl
 import party.morino.mpm.core.plugin.usecase.UninstallPluginUseCaseImpl
@@ -59,7 +61,6 @@ open class MinecraftPluginManager : JavaPlugin() {
     override fun onEnable() {
         // DIコンテナの初期化
         setupKoin()
-
         logger.info("MinecraftPluginManager has been enabled!")
     }
 
@@ -110,6 +111,7 @@ open class MinecraftPluginManager : JavaPlugin() {
                 single<UpdatePluginUseCase> { UpdatePluginUseCaseImpl() }
                 single<LockPluginUseCase> { LockPluginUseCaseImpl() }
                 single<UnlockPluginUseCase> { UnlockPluginUseCaseImpl() }
+                single<PluginVersionsUseCase> { PluginVersionsUseCaseImpl() }
             }
 
         // Koinの開始（すでに開始されている場合は何もしない）
