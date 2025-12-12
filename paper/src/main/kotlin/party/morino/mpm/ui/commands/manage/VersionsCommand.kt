@@ -9,8 +9,6 @@
 
 package party.morino.mpm.ui.commands.manage
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
@@ -43,24 +41,18 @@ class VersionsCommand : KoinComponent {
         @Argument("plugin") plugin: String,
         @Flag("limit") limit: Int = 20
     ) {
-        sender.sendMessage(
-            Component.text("プラグイン '$plugin' のバージョン一覧を取得しています...", NamedTextColor.GRAY)
-        )
+        sender.sendRichMessage("<gray>プラグイン '$plugin' のバージョン一覧を取得しています...</gray>")
 
         // ユースケースを実行
         pluginVersionsUseCase.getVersions(plugin).fold(
             // 失敗時の処理
             { errorMessage ->
-                sender.sendMessage(
-                    Component.text(errorMessage, NamedTextColor.RED)
-                )
+                sender.sendRichMessage("<red>$errorMessage</red>")
             },
             // 成功時の処理
             { versions ->
                 if (versions.isEmpty()) {
-                    sender.sendMessage(
-                        Component.text("プラグイン '$plugin' のバージョンが見つかりませんでした。", NamedTextColor.YELLOW)
-                    )
+                    sender.sendRichMessage("<yellow>プラグイン '$plugin' のバージョンが見つかりませんでした。")
                 } else {
                     // 表示件数を制限
                     val displayVersions = versions.take(limit)
@@ -74,36 +66,24 @@ class VersionsCommand : KoinComponent {
                         } else {
                             "=== プラグイン '$plugin' のバージョン一覧 (${totalCount}件) ==="
                         }
-                    sender.sendMessage(
-                        Component.text(headerMessage, NamedTextColor.GREEN)
-                    )
+                    sender.sendRichMessage("<green>$headerMessage</green>")
 
                     // バージョン一覧を表示
                     displayVersions.forEachIndexed { index, version ->
                         // 最新版を強調表示
                         if (index == 0) {
-                            sender.sendMessage(
-                                Component.text("  - $version (最新)", NamedTextColor.AQUA)
-                            )
+                            sender.sendRichMessage("<aqua> - $version (最新)</aqua>")
                         } else {
-                            sender.sendMessage(
-                                Component.text("  - $version", NamedTextColor.WHITE)
-                            )
+                            sender.sendRichMessage(" - $version")
                         }
                     }
 
                     // フッター表示
                     if (totalCount > limit) {
-                        sender.sendMessage(
-                            Component.text("残り${totalCount - displayCount}件のバージョンがあります。", NamedTextColor.GRAY)
-                        )
-                        sender.sendMessage(
-                            Component.text("すべて表示するには --limit $totalCount を指定してください。", NamedTextColor.GRAY)
-                        )
+                        sender.sendRichMessage("<gray>残り${totalCount - displayCount} 件のバージョンがあります。</gray>")
+                        sender.sendRichMessage("<gray>すべて表示するには --limit $totalCount を指定してください。")
                     }
-                    sender.sendMessage(
-                        Component.text("=".repeat(50), NamedTextColor.GREEN)
-                    )
+                    sender.sendRichMessage("<green>${"=".repeat(50)}</green>")
                 }
             }
         )
