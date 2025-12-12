@@ -19,7 +19,7 @@ jobs:
       AWS_DEFAULT_S3_SIGNATURE_VERSION: s3v4
       S3_UPLOAD_BUCKET: ${{ secrets.S3_UPLOAD_BUCKET }}
       S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-      PREVIEW_BASE_URL: https://mp-ci.nikomaru.dev/mpm
+      PREVIEW_BASE_URL: https://moripa-ci.nikomaru.dev/mpm
       PROJECT_NAME: MinecraftPluginManager
     runs-on: ubuntu-latest
 
@@ -63,7 +63,7 @@ jobs:
           # baseUrlを一時的に変更
           sed -i 's#baseUrl: "/"#baseUrl: "/mpm/${{ env.COMMIT_SHORT_SHA }}/docs/"#g' docusaurus.config.ts
           # urlを一時的に変更
-          sed -i 's#url: "https://mpm.plugin.morino.party"#url: "https://mp-ci.nikomaru.dev"#g' docusaurus.config.ts
+          sed -i 's#url: "https://mpm.plugin.morino.party"#url: "https://moripa-ci.nikomaru.dev"#g' docusaurus.config.ts
 
       - name: Install docs dependencies
         working-directory: docs

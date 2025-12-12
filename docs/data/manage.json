@@ -21,13 +21,6 @@
             "description": "`mpm-config.json`に記載されたすべてのプラグインをインストールします"
         },
         {
-            "command": "mpm install <url> [fileNameRegex]",
-            "status": "deprecated",
-            "category": "manage",
-            "section": "インストール・追加",
-            "description": "URLから直接プラグインをインストールする形式は削除されました"
-        },
-        {
             "command": "mpm uninstall <pluginName>",
             "status": "stable",
             "category": "manage",
