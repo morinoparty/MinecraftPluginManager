@@ -15,7 +15,7 @@ package party.morino.mpm.api.core.repository
  * リポジトリソースマネージャーのインターフェース
  * 複数のリポジトリソースを優先順位順に管理する
  */
-interface PluginRepositorySourceManager {
+interface RepositoryManager {
     /**
      * 利用可能なすべてのプラグインの一覧を取得
      * 複数のソースから重複を除いて返す

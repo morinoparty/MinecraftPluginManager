@@ -22,7 +22,7 @@ import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.plugin.PluginRepository
 import party.morino.mpm.api.core.plugin.PluginUpdateManager
 import party.morino.mpm.api.core.plugin.ProjectManager
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 import party.morino.mpm.config.PluginDirectoryImpl
 import party.morino.mpm.core.config.ConfigManagerImpl
 import party.morino.mpm.core.plugin.PluginInfoManagerImpl
@@ -49,7 +49,7 @@ open class MinecraftPluginManager :
     private val _pluginUpdateManager: PluginUpdateManager by lazy { GlobalContext.get().get() }
     private val _pluginMetadataManager: PluginMetadataManager by lazy { GlobalContext.get().get() }
     private val _projectManager: ProjectManager by lazy { GlobalContext.get().get() }
-    private val _pluginRepositorySourceManager: PluginRepositorySourceManager by lazy { GlobalContext.get().get() }
+    private val _repositoryManager: RepositoryManager by lazy { GlobalContext.get().get() }
 
     /**
      * プラグイン有効化時の処理
@@ -84,8 +84,8 @@ open class MinecraftPluginManager :
                 single<PluginDirectory> { PluginDirectoryImpl() }
                 single<ConfigManager> { ConfigManagerImpl() }
 
-                // リポジトリソースマネージャーの登録（ファクトリーを使用）
-                single<PluginRepositorySourceManager> {
+                // リポジトリマネージャーの登録（ファクトリーを使用）
+                single<RepositoryManager> {
                     RepositorySourceManagerFactory.create(get(), get())
                 }
 
@@ -124,5 +124,5 @@ open class MinecraftPluginManager :
 
     override fun getProjectManager(): ProjectManager = _projectManager
 
-    override fun getPluginRepositorySourceManager(): PluginRepositorySourceManager = _pluginRepositorySourceManager
+    override fun getRepositoryManager(): RepositoryManager = _repositoryManager
 }

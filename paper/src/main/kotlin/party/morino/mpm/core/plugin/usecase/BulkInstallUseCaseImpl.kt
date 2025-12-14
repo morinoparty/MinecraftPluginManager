@@ -24,7 +24,7 @@ import party.morino.mpm.api.core.plugin.InstallResult
 import party.morino.mpm.api.core.plugin.PluginInstallInfo
 import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.plugin.PluginRemovalInfo
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 import party.morino.mpm.api.model.repository.UrlData
 import party.morino.mpm.utils.DataClassReplacer.replaceTemplate
 import party.morino.mpm.utils.Utils
@@ -39,7 +39,7 @@ class BulkInstallUseCaseImpl :
     // Koinによる依存性注入
     private val pluginDirectory: PluginDirectory by inject()
     private val metadataManager: PluginMetadataManager by inject()
-    private val repositorySourceManager: PluginRepositorySourceManager by inject()
+    private val repositorySourceManager: RepositoryManager by inject()
     private val downloaderRepository: DownloaderRepository by inject()
 
     override suspend fun installAll(): Either<String, BulkInstallResult> {

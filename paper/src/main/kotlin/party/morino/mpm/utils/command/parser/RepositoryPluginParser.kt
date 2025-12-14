@@ -19,7 +19,7 @@ import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 import party.morino.mpm.api.model.plugin.RepositoryPlugin
 
 /**
@@ -31,7 +31,7 @@ class RepositoryPluginParser<C> :
     BlockingSuggestionProvider.Strings<CommandSender>,
     KoinComponent {
     // PluginRepositorySourceManagerをKoinから注入
-    private val pluginRepositorySourceManager: PluginRepositorySourceManager by inject()
+    private val pluginRepositorySourceManager: RepositoryManager by inject()
 
     /**
      * プラグインIDをパースしてRepositoryPluginを返す

@@ -16,7 +16,7 @@ import party.morino.mpm.api.core.plugin.PluginLifecycleManager
 import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.plugin.PluginUpdateManager
 import party.morino.mpm.api.core.plugin.ProjectManager
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 
 /**
  * MinecraftPluginManagerのAPIインターフェース
@@ -89,11 +89,11 @@ interface MinecraftPluginManagerAPI {
     fun getProjectManager(): ProjectManager
 
     /**
-     * プラグインリポジトリソースマネージャーを取得
+     * リポジトリマネージャーを取得
      *
      * リポジトリソースの管理を担当するマネージャー
      *
-     * @return PluginRepositorySourceManagerのインスタンス
+     * @return RepositoryManagerのインスタンス
      */
-    fun getPluginRepositorySourceManager(): PluginRepositorySourceManager
+    fun getRepositoryManager(): RepositoryManager
 }
