@@ -49,7 +49,7 @@ class PluginRepositoryImpl :
 
     // プラグインのメタデータを保存するディレクトリ（DIから取得）
     private val metadataDir: File
-        get() = pluginDirectory.getRepositoryDirectory()
+        get() = pluginDirectory.getMetadataDirectory()
 
     /**
      * 指定された名前のプラグインを取得
