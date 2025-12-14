@@ -18,7 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.core.plugin.DownloaderRepository
-import party.morino.mpm.api.core.repository.RepositoryManager
+import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
 import party.morino.mpm.api.core.repository.RepositoryConfig
 import party.morino.mpm.api.core.repository.RepositoryFile
 import java.io.File
@@ -34,7 +34,7 @@ class RepositoryCommands : KoinComponent {
     // KoinによるDI
     private val downloaderRepository: DownloaderRepository by inject()
     private val pluginDirectory: PluginDirectory by inject()
-    private val repositorySourceManager: RepositoryManager by inject()
+    private val repositorySourceManager: PluginRepositorySourceManager by inject()
 
     // JSONシリアライザー（整形済み）
     private val json =

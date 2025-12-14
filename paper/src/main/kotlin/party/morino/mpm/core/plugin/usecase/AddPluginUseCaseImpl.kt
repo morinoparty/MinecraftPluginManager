@@ -9,8 +9,6 @@
 
 package party.morino.mpm.core.plugin.usecase
 
-import party.morino.mpm.core.plugin.infrastructure.PluginMetadataManagerImpl
-
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
@@ -22,8 +20,8 @@ import party.morino.mpm.api.config.plugin.MpmConfig
 import party.morino.mpm.api.config.plugin.withSortedPlugins
 import party.morino.mpm.api.core.plugin.AddPluginUseCase
 import party.morino.mpm.api.core.plugin.DownloaderRepository
-// PluginMetadataManager import removed (now part of PluginManager)
-import party.morino.mpm.api.core.repository.RepositoryManager
+import party.morino.mpm.api.core.plugin.PluginMetadataManager
+import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
 import party.morino.mpm.api.model.repository.UrlData
 import party.morino.mpm.utils.Utils
 import java.io.File
@@ -37,9 +35,9 @@ class AddPluginUseCaseImpl :
     KoinComponent {
     // Koinによる依存性注入
     private val pluginDirectory: PluginDirectory by inject()
-    private val repositorySourceManager: RepositoryManager by inject()
+    private val repositorySourceManager: PluginRepositorySourceManager by inject()
     private val downloaderRepository: DownloaderRepository by inject()
-    private val metadataManager: PluginMetadataManagerImpl = PluginMetadataManagerImpl()
+    private val metadataManager: PluginMetadataManager by inject()
 
     /**
      * プラグインを管理対象に追加する

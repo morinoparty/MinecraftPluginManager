@@ -9,8 +9,6 @@
 
 package party.morino.mpm.core.plugin.usecase
 
-import party.morino.mpm.core.plugin.infrastructure.PluginMetadataManagerImpl
-
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
@@ -19,7 +17,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.core.plugin.CheckOutdatedUseCase
 import party.morino.mpm.api.core.plugin.PluginInstallUseCase
-// PluginMetadataManager import removed (now part of PluginManager)
+import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.plugin.UpdatePluginUseCase
 import party.morino.mpm.api.model.plugin.UpdateResult
 
@@ -33,7 +31,7 @@ class UpdatePluginUseCaseImpl :
     // Koinによる依存性注入
     private val checkOutdatedUseCase: CheckOutdatedUseCase by inject()
     private val pluginInstallUseCase: PluginInstallUseCase by inject()
-    private val pluginMetadataManager: PluginMetadataManagerImpl = PluginMetadataManagerImpl()
+    private val pluginMetadataManager: PluginMetadataManager by inject()
 
     /**
      * 新しいバージョンがあるすべてのプラグインを更新する

@@ -16,8 +16,7 @@ import org.incendo.cloud.annotations.Flag
 import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginManager
-
+import party.morino.mpm.api.core.plugin.PluginInfoManager
 import party.morino.mpm.api.model.plugin.RepositoryPlugin
 
 /**
@@ -29,7 +28,7 @@ import party.morino.mpm.api.model.plugin.RepositoryPlugin
 @Permission("mpm.command")
 class VersionsCommand : KoinComponent {
     // Koinによる依存性注入
-    private val infoManager: PluginManager by inject()
+    private val infoManager: PluginInfoManager by inject()
 
     /**
      * 指定されたプラグインの利用可能なバージョン一覧を表示するコマンド

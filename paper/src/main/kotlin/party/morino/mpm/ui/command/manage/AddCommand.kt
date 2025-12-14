@@ -15,7 +15,7 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginManager
+import party.morino.mpm.api.core.plugin.PluginLifecycleManager
 import party.morino.mpm.api.model.plugin.RepositoryPlugin
 
 /**
@@ -27,7 +27,7 @@ import party.morino.mpm.api.model.plugin.RepositoryPlugin
 @Permission("mpm.command")
 class AddCommand : KoinComponent {
     // KoinによるDI
-    private val lifecycleManager: PluginManager by inject()
+    private val lifecycleManager: PluginLifecycleManager by inject()
 
     /**
      * プラグインを管理対象に追加するコマンド

@@ -15,8 +15,7 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginManager
-
+import party.morino.mpm.api.core.plugin.PluginUpdateManager
 import party.morino.mpm.api.model.plugin.InstalledPlugin
 
 /**
@@ -29,7 +28,7 @@ import party.morino.mpm.api.model.plugin.InstalledPlugin
 @Permission("mpm.command")
 class LockCommand : KoinComponent {
     // Koinによる依存性注入
-    private val updateManager: PluginManager by inject()
+    private val updateManager: PluginUpdateManager by inject()
 
     /**
      * プラグインをロックするコマンド

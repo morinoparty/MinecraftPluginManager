@@ -11,24 +11,24 @@ package party.morino.mpm.core.repository
 
 import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.core.config.ConfigManager
-import party.morino.mpm.api.core.repository.RepositoryManager
+import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
 
 /**
  * リポジトリソースマネージャーを生成するファクトリー
  */
 object RepositorySourceManagerFactory {
     /**
-     * プラグインディレクトリとConfigManagerからリポジトリマネージャーを生成
+     * プラグインディレクトリとConfigManagerからリポジトリソースマネージャーを生成
      * config.jsonからリポジトリ設定を読み込む
      *
      * @param pluginDirectory プラグインディレクトリ
      * @param configManager 設定マネージャー
-     * @return リポジトリマネージャー
+     * @return リポジトリソースマネージャー
      */
     fun create(
         pluginDirectory: PluginDirectory,
         configManager: ConfigManager
-    ): RepositoryManager {
+    ): PluginRepositorySourceManager {
         // rootディレクトリを取得
         val rootDir = pluginDirectory.getRootDirectory()
 
@@ -38,6 +38,6 @@ object RepositorySourceManagerFactory {
 
         // リポジトリソースのリストを生成してマネージャーを作成
         val sources = RepositorySourceFactory.createAll(repositoryConfigs, rootDir)
-        return RepositoryManagerImpl(sources)
+        return RepositorySourceManager(sources)
     }
 }

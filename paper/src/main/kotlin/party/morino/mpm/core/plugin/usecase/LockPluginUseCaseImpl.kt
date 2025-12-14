@@ -14,9 +14,9 @@ import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import party.morino.mpm.api.core.plugin.LockPluginUseCase
-import party.morino.mpm.core.plugin.infrastructure.PluginMetadataManagerImpl
-// PluginMetadataManager import removed (now part of PluginManager)
+import party.morino.mpm.api.core.plugin.PluginMetadataManager
 
 /**
  * mpm lockコマンドに関するユースケースの実装
@@ -26,7 +26,7 @@ class LockPluginUseCaseImpl :
     LockPluginUseCase,
     KoinComponent {
     // Koinによる依存性注入
-    private val pluginMetadataManager: PluginMetadataManagerImpl = PluginMetadataManagerImpl()
+    private val pluginMetadataManager: PluginMetadataManager by inject()
 
     /**
      * プラグインをロックする
