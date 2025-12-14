@@ -18,7 +18,7 @@ import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.config.plugin.MpmConfig
 import party.morino.mpm.api.core.plugin.DownloaderRepository
 import party.morino.mpm.api.core.plugin.PluginVersionsUseCase
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 import party.morino.mpm.api.model.repository.UrlData
 import party.morino.mpm.utils.Utils
 import java.io.File
@@ -32,7 +32,7 @@ class PluginVersionsUseCaseImpl :
     KoinComponent {
     // Koinによる依存性注入
     private val pluginDirectory: PluginDirectory by inject()
-    private val repositorySourceManager: PluginRepositorySourceManager by inject()
+    private val repositorySourceManager: RepositoryManager by inject()
     private val downloaderRepository: DownloaderRepository by inject()
 
     /**

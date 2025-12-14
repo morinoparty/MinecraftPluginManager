@@ -10,16 +10,16 @@
 package party.morino.mpm.core.repository
 
 import party.morino.mpm.api.core.repository.PluginRepositorySource
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
 import party.morino.mpm.api.core.repository.RepositoryFile
+import party.morino.mpm.api.core.repository.RepositoryManager
 
 /**
  * リポジトリソースマネージャーの実装
  * 複数のリポジトリソースを優先順位順に管理する
  */
-class RepositorySourceManager(
+class RepositoryManagerImpl(
     private val sources: List<PluginRepositorySource>
-) : PluginRepositorySourceManager {
+) : RepositoryManager {
     // キャッシュ用のプロパティ
     private var cachedPlugins: List<String>? = null
     private var cacheExpirationTime: Long = 0
