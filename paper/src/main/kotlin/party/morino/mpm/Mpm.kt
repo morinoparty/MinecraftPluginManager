@@ -40,8 +40,8 @@ import party.morino.mpm.core.repository.RepositorySourceManagerFactory
  * プラグインの起動・終了処理やDIコンテナの設定を担当
  */
 open class Mpm :
-        JavaPlugin(),
-        MpmAPI {
+    JavaPlugin(),
+    MpmAPI {
     // 各マネージャーのインスタンスをKoinから遅延初期化
     private val _configManager: ConfigManager by lazy { GlobalContext.get().get() }
     private val _pluginDirectory: PluginDirectory by lazy { GlobalContext.get().get() }

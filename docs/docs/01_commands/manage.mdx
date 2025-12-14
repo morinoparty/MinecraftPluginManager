@@ -83,11 +83,17 @@ mv plugins/YourPlugin.jar plugins/MinecraftPluginManager/local/
 ### インストール済みプラグインの確認
 
 ```bash
-# すべてのプラグインを表示
+# すべてのプラグインを表示（デフォルト）
 /mpm list
 
-# 管理下のプラグインのみ表示
-/mpm list --managed
+# すべてのプラグインを表示（明示的）
+/mpm list --all
+
+# 有効なプラグインのみ表示
+/mpm list --enabled
+
+# 無効なプラグインのみ表示
+/mpm list --disabled
 
 # 管理外のプラグインのみ表示
 /mpm list --unmanaged

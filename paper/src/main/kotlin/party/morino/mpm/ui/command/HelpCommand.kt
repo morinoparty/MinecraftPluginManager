@@ -9,5 +9,4 @@
 
 package party.morino.mpm.ui.command
 
-class HelpCommand {
-}
+class HelpCommand

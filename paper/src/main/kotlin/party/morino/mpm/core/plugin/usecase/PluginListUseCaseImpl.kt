@@ -87,19 +87,18 @@ class PluginListUseCaseImpl :
      * @return 無効なプラグインのリスト
      */
     override suspend fun getDisabledPlugins(): List<PluginData> {
-        val disabledPluginNames =
-            getAllServerPlugins()
-                .filter { !it.value }
-                .map { it.key }
-                .toSet()
+        // サーバー上の全プラグインの状態を取得
+        val serverPlugins = getAllServerPlugins()
 
+        // 管理下のプラグインの中で、サーバー上に存在しないか、存在するが無効なものを返す
         return getAllManagedPlugins().filter {
             val name =
                 when (it) {
                     is PluginData.BukkitPluginData -> it.name
                     is PluginData.PaperPluginData -> it.name
                 }
-            name in disabledPluginNames
+            // serverPlugins[name]がnull（ロードされていない）またはfalse（無効）の場合にtrue
+            serverPlugins[name] != true
         }
     }
 }

@@ -57,8 +57,8 @@ class MpmBootstrap : PluginBootstrap {
             UpdateCommand(),
             VersionsCommand(),
             RepositoryCommands(),
-                HelpCommand(),
-                ReloadCommand(),
+            HelpCommand(),
+            ReloadCommand()
         )
 
     /**
@@ -99,7 +99,5 @@ class MpmBootstrap : PluginBootstrap {
      * @param context プラグインプロバイダコンテキスト
      * @return mpmプラグインのインスタンス
      */
-    override fun createPlugin(context: PluginProviderContext): JavaPlugin {
-        return Mpm()
-    }
+    override fun createPlugin(context: PluginProviderContext): JavaPlugin = Mpm()
 }

@@ -18,9 +18,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.core.plugin.DownloaderRepository
-import party.morino.mpm.api.core.repository.RepositoryManager
 import party.morino.mpm.api.core.repository.RepositoryConfig
 import party.morino.mpm.api.core.repository.RepositoryFile
+import party.morino.mpm.api.core.repository.RepositoryManager
 import java.io.File
 
 /**
