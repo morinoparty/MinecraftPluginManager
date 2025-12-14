@@ -16,21 +16,15 @@ import party.morino.mpm.api.MinecraftPluginManagerAPI
 import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.core.config.ConfigManager
 import party.morino.mpm.api.core.plugin.DownloaderRepository
-import party.morino.mpm.api.core.plugin.PluginInfoManager
-import party.morino.mpm.api.core.plugin.PluginLifecycleManager
-import party.morino.mpm.api.core.plugin.PluginMetadataManager
+import party.morino.mpm.api.core.plugin.PluginManager
 import party.morino.mpm.api.core.plugin.PluginRepository
-import party.morino.mpm.api.core.plugin.PluginUpdateManager
 import party.morino.mpm.api.core.plugin.ProjectManager
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 import party.morino.mpm.config.PluginDirectoryImpl
 import party.morino.mpm.core.config.ConfigManagerImpl
-import party.morino.mpm.core.plugin.PluginInfoManagerImpl
-import party.morino.mpm.core.plugin.PluginLifecycleManagerImpl
-import party.morino.mpm.core.plugin.PluginUpdateManagerImpl
+import party.morino.mpm.core.plugin.PluginManagerImpl
 import party.morino.mpm.core.plugin.ProjectManagerImpl
 import party.morino.mpm.core.plugin.infrastructure.DownloaderRepositoryImpl
-import party.morino.mpm.core.plugin.infrastructure.PluginMetadataManagerImpl
 import party.morino.mpm.core.plugin.infrastructure.PluginRepositoryImpl
 import party.morino.mpm.core.repository.RepositorySourceManagerFactory
 
@@ -44,12 +38,9 @@ open class MinecraftPluginManager :
     // 各マネージャーのインスタンスをKoinから遅延初期化
     private val _configManager: ConfigManager by lazy { GlobalContext.get().get() }
     private val _pluginDirectory: PluginDirectory by lazy { GlobalContext.get().get() }
-    private val _pluginInfoManager: PluginInfoManager by lazy { GlobalContext.get().get() }
-    private val _pluginLifecycleManager: PluginLifecycleManager by lazy { GlobalContext.get().get() }
-    private val _pluginUpdateManager: PluginUpdateManager by lazy { GlobalContext.get().get() }
-    private val _pluginMetadataManager: PluginMetadataManager by lazy { GlobalContext.get().get() }
+    private val _pluginManager: PluginManager by lazy { GlobalContext.get().get() }
     private val _projectManager: ProjectManager by lazy { GlobalContext.get().get() }
-    private val _pluginRepositorySourceManager: PluginRepositorySourceManager by lazy { GlobalContext.get().get() }
+    private val _repositoryManager: RepositoryManager by lazy { GlobalContext.get().get() }
 
     /**
      * プラグイン有効化時の処理
@@ -84,8 +75,8 @@ open class MinecraftPluginManager :
                 single<PluginDirectory> { PluginDirectoryImpl() }
                 single<ConfigManager> { ConfigManagerImpl() }
 
-                // リポジトリソースマネージャーの登録（ファクトリーを使用）
-                single<PluginRepositorySourceManager> {
+                // リポジトリマネージャーの登録（ファクトリーを使用）
+                single<RepositoryManager> {
                     RepositorySourceManagerFactory.create(get(), get())
                 }
 
@@ -93,13 +84,8 @@ open class MinecraftPluginManager :
                 single<DownloaderRepository> { DownloaderRepositoryImpl() }
                 single<PluginRepository> { PluginRepositoryImpl() }
 
-                // メタデータマネージャーの登録（依存性はKoinのinjectによって自動注入される）
-                single<PluginMetadataManager> { PluginMetadataManagerImpl() }
-
                 // ドメイン単位のManagerの登録（Facadeパターンで関連UseCaseをまとめる）
-                single<PluginLifecycleManager> { PluginLifecycleManagerImpl() }
-                single<PluginInfoManager> { PluginInfoManagerImpl() }
-                single<PluginUpdateManager> { PluginUpdateManagerImpl() }
+                single<PluginManager> { PluginManagerImpl() }
                 single<ProjectManager> { ProjectManagerImpl() }
             }
 
@@ -114,15 +100,9 @@ open class MinecraftPluginManager :
 
     override fun getPluginDirectory(): PluginDirectory = _pluginDirectory
 
-    override fun getPluginInfoManager(): PluginInfoManager = _pluginInfoManager
-
-    override fun getPluginLifecycleManager(): PluginLifecycleManager = _pluginLifecycleManager
-
-    override fun getPluginUpdateManager(): PluginUpdateManager = _pluginUpdateManager
-
-    override fun getPluginMetadataManager(): PluginMetadataManager = _pluginMetadataManager
+    override fun getPluginManager(): PluginManager = _pluginManager
 
     override fun getProjectManager(): ProjectManager = _projectManager
 
-    override fun getPluginRepositorySourceManager(): PluginRepositorySourceManager = _pluginRepositorySourceManager
+    override fun getRepositoryManager(): RepositoryManager = _repositoryManager
 }

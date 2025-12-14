@@ -11,12 +11,9 @@ package party.morino.mpm.api
 
 import party.morino.mpm.api.config.PluginDirectory
 import party.morino.mpm.api.core.config.ConfigManager
-import party.morino.mpm.api.core.plugin.PluginInfoManager
-import party.morino.mpm.api.core.plugin.PluginLifecycleManager
-import party.morino.mpm.api.core.plugin.PluginMetadataManager
-import party.morino.mpm.api.core.plugin.PluginUpdateManager
+import party.morino.mpm.api.core.plugin.PluginManager
 import party.morino.mpm.api.core.plugin.ProjectManager
-import party.morino.mpm.api.core.repository.PluginRepositorySourceManager
+import party.morino.mpm.api.core.repository.RepositoryManager
 
 /**
  * MinecraftPluginManagerのAPIインターフェース
@@ -44,40 +41,18 @@ interface MinecraftPluginManagerAPI {
     fun getPluginDirectory(): PluginDirectory
 
     /**
-     * プラグイン情報マネージャーを取得
+     * プラグインマネージャーを取得
      *
-     * プラグインの情報取得やリスト表示を担当するマネージャー
+     * プラグインの統合管理を担当するマネージャー
+     * 以下の機能を提供する：
+     * - メタデータ管理（metadata/xxx.yamlファイルの作成・更新・読み込み・保存）
+     * - 情報管理（プラグイン情報の取得、リスト表示、バージョン確認）
+     * - ライフサイクル管理（追加、削除、インストール、アンインストール）
+     * - 更新管理（更新、ロック、一括インストール）
      *
-     * @return PluginInfoManagerのインスタンス
+     * @return PluginManagerのインスタンス
      */
-    fun getPluginInfoManager(): PluginInfoManager
-
-    /**
-     * プラグインライフサイクルマネージャーを取得
-     *
-     * プラグインのインストール・削除・有効化/無効化を担当するマネージャー
-     *
-     * @return PluginLifecycleManagerのインスタンス
-     */
-    fun getPluginLifecycleManager(): PluginLifecycleManager
-
-    /**
-     * プラグイン更新マネージャーを取得
-     *
-     * プラグインの更新チェックとアップデートを担当するマネージャー
-     *
-     * @return PluginUpdateManagerのインスタンス
-     */
-    fun getPluginUpdateManager(): PluginUpdateManager
-
-    /**
-     * プラグインメタデータマネージャーを取得
-     *
-     * プラグインのメタデータ管理を担当するマネージャー
-     *
-     * @return PluginMetadataManagerのインスタンス
-     */
-    fun getPluginMetadataManager(): PluginMetadataManager
+    fun getPluginManager(): PluginManager
 
     /**
      * プロジェクトマネージャーを取得
@@ -89,11 +64,11 @@ interface MinecraftPluginManagerAPI {
     fun getProjectManager(): ProjectManager
 
     /**
-     * プラグインリポジトリソースマネージャーを取得
+     * リポジトリマネージャーを取得
      *
      * リポジトリソースの管理を担当するマネージャー
      *
-     * @return PluginRepositorySourceManagerのインスタンス
+     * @return RepositoryManagerのインスタンス
      */
-    fun getPluginRepositorySourceManager(): PluginRepositorySourceManager
+    fun getRepositoryManager(): RepositoryManager
 }

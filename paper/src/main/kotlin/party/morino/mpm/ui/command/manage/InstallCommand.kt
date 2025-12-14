@@ -14,7 +14,8 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginUpdateManager
+import party.morino.mpm.api.core.plugin.PluginManager
+
 
 /**
  * 一括インストールコマンドのコントローラー
@@ -25,7 +26,7 @@ import party.morino.mpm.api.core.plugin.PluginUpdateManager
 @Permission("mpm.command")
 class InstallCommand : KoinComponent {
     // KoinによるDI
-    private val updateManager: PluginUpdateManager by inject()
+    private val updateManager: PluginManager by inject()
 
     /**
      * mpm.jsonに定義されたプラグインを一括インストールするコマンド

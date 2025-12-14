@@ -26,7 +26,6 @@ import party.morino.mpm.api.config.plugin.PluginSettings
 import party.morino.mpm.api.config.plugin.RepositoryInfo
 import party.morino.mpm.api.config.plugin.VersionDetail
 import party.morino.mpm.api.config.plugin.VersionManagement
-import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.repository.RepositoryConfig
 import party.morino.mpm.api.model.repository.RepositoryType
 import party.morino.mpm.api.model.repository.VersionData
@@ -39,14 +38,11 @@ import java.time.format.DateTimeFormatter
  * プラグインメタデータ管理の実装クラス
  * metadata/xxx.yamlファイルの操作を担当する
  **/
-
-class PluginMetadataManagerImpl :
-    PluginMetadataManager,
-    KoinComponent {
+class PluginMetadataManagerImpl : KoinComponent {
     // Koinによる依存性注入
     private val pluginDirectory: PluginDirectory by inject()
 
-    override suspend fun createMetadata(
+    suspend fun createMetadata(
         pluginName: String,
         repository: RepositoryConfig,
         versionData: VersionData,
@@ -120,7 +116,7 @@ class PluginMetadataManagerImpl :
         return metadata.right()
     }
 
-    override suspend fun updateMetadata(
+    suspend fun updateMetadata(
         pluginName: String,
         versionData: VersionData,
         latestVersionData: VersionData,
@@ -190,7 +186,7 @@ class PluginMetadataManagerImpl :
         return updatedMetadata.right()
     }
 
-    override fun loadMetadata(pluginName: String): Either<String, ManagedPlugin> {
+    fun loadMetadata(pluginName: String): Either<String, ManagedPlugin> {
         // メタデータディレクトリを取得
         val metadataDir = pluginDirectory.getMetadataDirectory()
         val metadataFile = File(metadataDir, "$pluginName.yaml")
@@ -210,7 +206,7 @@ class PluginMetadataManagerImpl :
         }
     }
 
-    override fun saveMetadata(
+    fun saveMetadata(
         pluginName: String,
         metadata: ManagedPlugin
     ): Either<String, Unit> {

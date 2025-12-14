@@ -1,5 +1,5 @@
 # MinecraftPluginManager
-This is a plugin for manager some minecraft plugins. <br>
+This is a plugin for manager some minecraft plugins.
 
 ## License 
 Written in 2024 by Nikomaru &emsp; No Rights Reserved. <br>

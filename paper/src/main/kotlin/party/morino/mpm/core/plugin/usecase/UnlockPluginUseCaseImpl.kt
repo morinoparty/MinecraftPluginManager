@@ -9,13 +9,14 @@
 
 package party.morino.mpm.core.plugin.usecase
 
+import party.morino.mpm.core.plugin.infrastructure.PluginMetadataManagerImpl
+
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginMetadataManager
+// PluginMetadataManager import removed (now part of PluginManager)
 import party.morino.mpm.api.core.plugin.UnlockPluginUseCase
 
 /**
@@ -26,7 +27,7 @@ class UnlockPluginUseCaseImpl :
     UnlockPluginUseCase,
     KoinComponent {
     // Koinによる依存性注入
-    private val pluginMetadataManager: PluginMetadataManager by inject()
+    private val pluginMetadataManager: PluginMetadataManagerImpl = PluginMetadataManagerImpl()
 
     /**
      * プラグインのロックを解除する

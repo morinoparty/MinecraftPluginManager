@@ -15,7 +15,8 @@ import org.incendo.cloud.annotations.Flag
 import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginInfoManager
+import party.morino.mpm.api.core.plugin.PluginManager
+
 import party.morino.mpm.api.model.plugin.PluginData
 
 /**
@@ -25,7 +26,7 @@ import party.morino.mpm.api.model.plugin.PluginData
 @Permission("mpm.command")
 class ListCommand : KoinComponent {
     // KoinによるDI
-    private val infoManager: PluginInfoManager by inject()
+    private val infoManager: PluginManager by inject()
 
     /**
      * 管理下のプラグインリストを表示するコマンド

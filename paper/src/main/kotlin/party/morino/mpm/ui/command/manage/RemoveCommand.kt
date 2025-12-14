@@ -15,7 +15,7 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import party.morino.mpm.api.core.plugin.PluginLifecycleManager
+import party.morino.mpm.api.core.plugin.PluginManager
 import party.morino.mpm.api.model.plugin.InstalledPlugin
 
 /**
@@ -27,7 +27,7 @@ import party.morino.mpm.api.model.plugin.InstalledPlugin
 @Permission("mpm.command")
 class RemoveCommand : KoinComponent {
     // Koinによる依存性注入
-    private val lifecycleManager: PluginLifecycleManager by inject()
+    private val lifecycleManager: PluginManager by inject()
 
     /**
      * プラグインを管理対象から除外するコマンド
