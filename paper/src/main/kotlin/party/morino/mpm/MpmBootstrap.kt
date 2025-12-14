@@ -40,7 +40,7 @@ import party.morino.mpm.utils.command.parser.RepositoryPluginParser
  * プラグインの初期化処理を行う
  */
 @Suppress("unused")
-class MinecraftPluginManagerBootstrap : PluginBootstrap {
+class MpmBootstrap : PluginBootstrap {
     lateinit var commandManager: PaperCommandManager.Bootstrapped<CommandSender>
     private val commands =
         listOf(
@@ -93,9 +93,9 @@ class MinecraftPluginManagerBootstrap : PluginBootstrap {
     /**
      * プラグインのインスタンスを作成するメソッド
      * @param context プラグインプロバイダコンテキスト
-     * @return MinecraftPluginManagerプラグインのインスタンス
+     * @return mpmプラグインのインスタンス
      */
     override fun createPlugin(context: PluginProviderContext): JavaPlugin {
-        return MinecraftPluginManager() // MinecraftPluginManagerプラグインのインスタンスを返す
+        return Mpm()
     }
 }
