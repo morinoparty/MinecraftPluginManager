@@ -9,6 +9,7 @@
 
 package party.morino.mpm
 
+import kotlinx.coroutines.runBlocking
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
@@ -58,6 +59,9 @@ open class Mpm :
     override fun onEnable() {
         // DIコンテナの初期化
         setupKoin()
+        runBlocking {
+            _configManager.reload()
+        }
         logger.info("mpm has been enabled!")
     }
 

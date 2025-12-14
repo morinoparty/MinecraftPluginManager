@@ -20,6 +20,8 @@ import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 import org.incendo.cloud.paper.PaperCommandManager
 import org.incendo.cloud.setting.Configurable
+import party.morino.mpm.ui.command.HelpCommand
+import party.morino.mpm.ui.command.ReloadCommand
 import party.morino.mpm.ui.command.manage.AddCommand
 import party.morino.mpm.ui.command.manage.InitCommand
 import party.morino.mpm.ui.command.manage.InstallCommand
@@ -54,7 +56,9 @@ class MpmBootstrap : PluginBootstrap {
             UninstallCommand(),
             UpdateCommand(),
             VersionsCommand(),
-            RepositoryCommands()
+            RepositoryCommands(),
+                HelpCommand(),
+                ReloadCommand(),
         )
 
     /**

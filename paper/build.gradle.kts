@@ -98,7 +98,7 @@ sourceSets.main {
             name = "mpm"
             version = "miencraft_plugin_version"
             website = "https://mpm.plugin.morino.party"
-            main = "$group.mpm.MPM"
+            main = "$group.mpm.Mpm"
             apiVersion = "1.20"
             libraries = libs.bundles.coroutines.asString()
             softDepend = listOf()
