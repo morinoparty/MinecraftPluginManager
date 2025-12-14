@@ -70,8 +70,13 @@ const config: Config = {
                     position: "right",
                 },
                 {
+                    href: "https://modrinth.com/plugin/mpm-package",
+                    label: "Modrinth",
+                    position: "right",
+                },
+                {
                     href: "https://github.com/morinoparty/mpm/releases",
-                    label: "Download",
+                    label: "Release",
                     position: "right",
                 },
                 {

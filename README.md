@@ -62,6 +62,6 @@ For detailed documentation, please visit the [documentation site](https://mpm.pl
 
 Written in 2024-2025 by Nikomaru &emsp; No Rights Reserved.
 
-To the extent possible under law, Nikomaru has waived all copyright and related or neighboring rights to MinecraftPluginManager. This work is published from: Japan.
+To the extent possible under law, Nikomaru has waived all copyright and related or neighboring rights to mpm. This work is published from: Japan.
 
 You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
