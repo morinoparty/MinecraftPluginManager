@@ -13,6 +13,7 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
+import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.config.PluginDirectory
@@ -23,7 +24,9 @@ import party.morino.mpm.api.core.plugin.AddPluginUseCase
 import party.morino.mpm.api.core.plugin.DownloaderRepository
 import party.morino.mpm.api.core.plugin.PluginMetadataManager
 import party.morino.mpm.api.core.repository.RepositoryManager
+import party.morino.mpm.api.model.plugin.RepositoryPlugin
 import party.morino.mpm.api.model.repository.UrlData
+import party.morino.mpm.event.PluginAddEvent
 import party.morino.mpm.utils.Utils
 import java.io.File
 
@@ -39,6 +42,7 @@ class AddPluginUseCaseImpl :
     private val repositorySourceManager: RepositoryManager by inject()
     private val downloaderRepository: DownloaderRepository by inject()
     private val metadataManager: PluginMetadataManager by inject()
+    private val plugin: JavaPlugin by inject()
 
     /**
      * プラグインを管理対象に追加する
@@ -158,6 +162,21 @@ class AddPluginUseCaseImpl :
             metadataManager
                 .createMetadata(pluginName, firstRepository, versionData, "add")
                 .getOrElse { return it.left() }
+
+        // PluginAddEventを発火して、他のプラグインがキャンセルできるようにする
+        val addEvent =
+            PluginAddEvent(
+                repositoryPlugin = RepositoryPlugin(pluginName),
+                versionSpecifier = version,
+                repositoryType = firstRepository.type,
+                repositoryId = firstRepository.repositoryId
+            )
+        plugin.server.pluginManager.callEvent(addEvent)
+
+        // イベントがキャンセルされた場合はスキップ
+        if (addEvent.isCancelled) {
+            return "追加がキャンセルされました".left()
+        }
 
         // pluginsマップに追加（決定されたバージョン番号を使用）
         val updatedPlugins = mpmConfig.plugins.toMutableMap()
