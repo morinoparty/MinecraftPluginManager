@@ -1,4 +1,4 @@
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "@/components/layout/docs/page";
 import { notFound } from "next/navigation";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
