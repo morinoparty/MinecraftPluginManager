@@ -7,6 +7,8 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import * as MdxConfig from "./source.config";
 
 export default defineConfig({
+    // 環境変数VITE_BASE_URLでbaseを設定可能（プレビュー環境用）
+    base: process.env.VITE_BASE_URL || "/",
     plugins: [
         tailwindcss(),
         fumadocs(MdxConfig, {

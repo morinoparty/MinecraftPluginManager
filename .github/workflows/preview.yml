@@ -64,8 +64,10 @@ jobs:
       - name: Generate Dokka API documentation
         run: ./gradlew dokkaGenerate
 
-      - name: Build Docusaurus
+      - name: Build docs
         working-directory: docs
+        env:
+          VITE_BASE_URL: /mpm/${{ env.COMMIT_SHORT_SHA }}/docs/
         run: pnpm run build
 
       - name: Build with Gradle
