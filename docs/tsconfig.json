@@ -1,13 +1,19 @@
 {
-    // This file is not used in compilation. It is here just for a nice editor experience.
-    "extends": "@docusaurus/tsconfig",
     "compilerOptions": {
-        "jsx": "react",
-        "types": ["@docusaurus/module-type-aliases", "node"],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "jsx": "react-jsx",
+        "lib": ["DOM", "DOM.Iterable", "ES2022"],
         "baseUrl": ".",
         "paths": {
-            "@site/*": ["./*"]
+            "@/*": ["./*"],
+            "@components/*": ["./components/*"],
+            "fumadocs-mdx:collections/*": ["./.source/*"]
         }
     },
-    "exclude": [".docusaurus", "build"]
+    "include": ["app", "components", "lib", ".source", "source.config.ts", "content"]
 }

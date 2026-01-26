@@ -13,6 +13,7 @@ package party.morino.mpm.api.application.plugin
 
 import arrow.core.Either
 import party.morino.mpm.api.application.model.AddWithDependenciesResult
+import party.morino.mpm.api.application.model.AdoptResult
 import party.morino.mpm.api.application.model.InstallResult
 import party.morino.mpm.api.domain.plugin.model.ManagedPlugin
 import party.morino.mpm.api.domain.plugin.model.PluginName
@@ -96,4 +97,17 @@ interface PluginLifecycleService {
         version: VersionSpecifier,
         includeSoftDependencies: Boolean = false
     ): Either<MpmError, AddWithDependenciesResult>
+
+    /**
+     * すべてのunmanagedプラグインをリポジトリから検索してadoptする
+     *
+     * unmanagedプラグイン（mpm.jsonで"unmanaged"として登録されているプラグイン）を
+     * リポジトリから検索し、見つかった場合はmanaged状態に変更してダウンロードする
+     *
+     * @param includeSoftDependencies softDependenciesも含めるかどうか
+     * @return adopt結果（adoptされたプラグイン、スキップされたプラグイン、失敗したプラグイン）
+     */
+    suspend fun adoptAll(
+        includeSoftDependencies: Boolean = false
+    ): Either<MpmError, AdoptResult>
 }

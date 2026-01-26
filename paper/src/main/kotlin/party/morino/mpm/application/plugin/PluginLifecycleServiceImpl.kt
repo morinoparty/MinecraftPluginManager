@@ -19,8 +19,11 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import party.morino.mpm.api.application.model.AddWithDependenciesResult
+import party.morino.mpm.api.application.model.AdoptResult
 import party.morino.mpm.api.application.model.InstallResult
 import party.morino.mpm.api.application.model.PluginAddResult
+import party.morino.mpm.api.application.model.PluginFilter
+import party.morino.mpm.api.application.plugin.PluginInfoService
 import party.morino.mpm.api.application.model.PluginInstallInfo
 import party.morino.mpm.api.application.model.PluginRemovalInfo
 import party.morino.mpm.api.application.plugin.PluginLifecycleService
@@ -66,6 +69,7 @@ class PluginLifecycleServiceImpl :
     private val downloaderRepository: DownloaderRepository by inject()
     private val metadataManager: PluginMetadataManager by inject()
     private val plugin: JavaPlugin by inject()
+    private val infoService: PluginInfoService by inject()
 
     /**
      * プラグインを管理対象に追加する
@@ -915,5 +919,77 @@ class PluginLifecycleServiceImpl :
                 )
             }
         )
+    }
+
+    /**
+     * すべてのunmanagedプラグインをリポジトリから検索してadoptする
+     *
+     * unmanagedプラグイン（mpm.jsonで"unmanaged"として登録されているプラグイン）を
+     * リポジトリから検索し、見つかった場合はmanaged状態に変更してダウンロードする
+     *
+     * @param includeSoftDependencies softDependenciesも含めるかどうか
+     * @return adopt結果（adoptされたプラグイン、スキップされたプラグイン、失敗したプラグイン）
+     */
+    override suspend fun adoptAll(
+        includeSoftDependencies: Boolean
+    ): Either<MpmError, AdoptResult> {
+        // unmanagedプラグイン一覧を取得
+        val unmanagedPlugins = infoService.list(PluginFilter.UNMANAGED)
+        val unmanagedNames = unmanagedPlugins.map { it.name.value }
+
+        // リポジトリの利用可能なプラグイン一覧を取得
+        val availablePlugins = repositoryManager.getAvailablePlugins()
+
+        // unmanagedプラグインとリポジトリをマッチング（大文字小文字を無視）
+        // リポジトリのプラグイン名をキー（小文字）、元の名前を値としたマップを作成
+        val availablePluginsMap = availablePlugins.associateBy { it.lowercase() }
+
+        // マッチしたプラグインと見つからなかったプラグインを分類
+        val matchedPlugins = mutableListOf<Pair<String, String>>() // unmanagedName to repoName
+        val skippedPlugins = mutableListOf<String>()
+
+        for (unmanagedName in unmanagedNames) {
+            val repoName = availablePluginsMap[unmanagedName.lowercase()]
+            if (repoName != null) {
+                // リポジトリに見つかった場合、元のリポジトリの名前を使用
+                matchedPlugins.add(unmanagedName to repoName)
+            } else {
+                // リポジトリに見つからなかった場合
+                skippedPlugins.add(unmanagedName)
+            }
+        }
+
+        // マッチしたプラグインをadopt（addWithDependenciesを使用）
+        val adoptedPlugins = mutableListOf<PluginAddResult>()
+        val failedPlugins = mutableMapOf<String, String>()
+        val notFoundDependencies = mutableListOf<String>()
+
+        for ((_, repoName) in matchedPlugins) {
+            // addWithDependenciesを呼び出してプラグインを追加
+            addWithDependencies(
+                PluginName(repoName),
+                VersionSpecifier.Latest,
+                includeSoftDependencies
+            ).fold(
+                { error ->
+                    // エラーが発生した場合
+                    failedPlugins[repoName] = error.message
+                },
+                { result ->
+                    // 成功した場合、結果を集約
+                    adoptedPlugins.addAll(result.addedPlugins)
+                    notFoundDependencies.addAll(result.notFoundPlugins)
+                    // 失敗したプラグインも集約
+                    failedPlugins.putAll(result.failedPlugins)
+                }
+            )
+        }
+
+        return AdoptResult(
+            adoptedPlugins = adoptedPlugins,
+            skippedPlugins = skippedPlugins,
+            failedPlugins = failedPlugins,
+            notFoundDependencies = notFoundDependencies.distinct()
+        ).right()
     }
 }

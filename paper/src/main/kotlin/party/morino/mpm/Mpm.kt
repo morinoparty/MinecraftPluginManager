@@ -47,6 +47,7 @@ import party.morino.mpm.infrastructure.persistence.ProjectRepositoryImpl
 import party.morino.mpm.infrastructure.repository.RepositorySourceManagerFactory
 import party.morino.mpm.ui.command.ReloadCommand
 import party.morino.mpm.ui.command.manage.AddCommand
+import party.morino.mpm.ui.command.manage.AdoptCommand
 import party.morino.mpm.ui.command.manage.BackupCommand
 import party.morino.mpm.ui.command.manage.DependencyCommand
 import party.morino.mpm.ui.command.manage.InitCommand
@@ -174,6 +175,7 @@ open class Mpm :
 
         // 全コマンドの登録
         lamp.register(AddCommand())
+        lamp.register(AdoptCommand())
         lamp.register(BackupCommand())
         lamp.register(DependencyCommand())
         lamp.register(InitCommand())
