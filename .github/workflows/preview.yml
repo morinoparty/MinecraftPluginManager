@@ -84,7 +84,7 @@ jobs:
           mkdir -p ./upload/detekt
           cp -r ./build/reports/detekt/* ./upload/detekt/
           mkdir -p ./upload/docs
-          cp -r ./docs/dist/* ./upload/docs/
+          cp -r ./docs/dist/client/* ./upload/docs/
           aws s3 cp ./upload --endpoint-url ${S3_ENDPOINT} s3://${{ env.S3_UPLOAD_BUCKET }}/mpm/${{ env.COMMIT_SHORT_SHA }} --recursive --checksum-algorithm=CRC32 || echo "S3 upload completed with warnings"
 
       - name: Publish test results

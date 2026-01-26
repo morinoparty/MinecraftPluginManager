@@ -1,4 +1,3 @@
-import { cloudflare } from "@cloudflare/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -9,7 +8,6 @@ import * as MdxConfig from "./source.config";
 
 export default defineConfig({
     plugins: [
-        // cloudflare({ viteEnvironment: { name: "ssr" } }),
         tailwindcss(),
         fumadocs(MdxConfig, {
             index: {
@@ -19,7 +17,8 @@ export default defineConfig({
         tanstackStart({
             srcDirectory: "app",
             prerender: {
-                enabled: false,
+                enabled: true,
+                crawlLinks: true,
             },
         }),
         tsconfigPaths(),

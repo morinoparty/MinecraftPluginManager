@@ -51,7 +51,7 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./docs/dist
+          path: ./docs/dist/client
 
   deploy:
     name: Deploy to GitHub Pages
