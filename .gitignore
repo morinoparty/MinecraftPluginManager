@@ -127,3 +127,15 @@ bin/
 **/node_modules
 
 **/.wrangler
+
+# Docs (fumadocs/next.js)
+docs/.source
+docs/.next
+docs/out
+docs/next-env.d.ts
+
+# Playwright MCP
+.playwright-mcp/
+
+# Old docs backup
+docs_old/

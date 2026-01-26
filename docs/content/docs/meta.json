@@ -1,0 +1,16 @@
+{
+    "title": "MPM Documentation",
+    "pages": [
+        "intro",
+        "---Commands---",
+        "...commands",
+        "---Usage---",
+        "...usage",
+        "---API---",
+        "...api",
+        "---File Format---",
+        "...format",
+        "---Utilities---",
+        "...utils"
+    ]
+}

@@ -1,0 +1,324 @@
+---
+title: Getting Started
+description: MinecraftPluginManagerを使って、プラグインを簡単に管理する方法を学びましょう
+---
+
+MinecraftPluginManagerを使って、プラグインを簡単に管理する方法を学びましょう。
+
+## クイックスタート
+
+### ステップ1: リポジトリファイルを作成
+
+プラグインのダウンロード元を設定するJSONファイルを作成します。
+
+#### 方法1: コマンドで自動生成（推奨）
+
+URLから自動的にリポジトリファイルを作成できます：
+
+```bash
+/mpm create-repo QuickShop https://modrinth.com/plugin/quickshop-hikari
+```
+
+このコマンドは：
+- URLからリポジトリタイプを自動判定（GitHub、Modrinth、SpigotMC対応）
+- `plugins/MinecraftPluginManager/repository/QuickShop.json`を自動生成
+- すぐに使える設定ファイルを作成
+
+#### 方法2: 手動で作成
+
+手動でJSONファイルを作成することもできます：
+
+```bash
+# サーバーのpluginsディレクトリ内
+plugins/MinecraftPluginManager/repository/
+```
+
+**例: QuickShop.json**
+```json
+{
+    "id": "QuickShop",
+    "website": "https://www.spigotmc.org/resources/quickshop-hikari.100125/",
+    "repositories": [
+        {
+            "type": "modrinth",
+            "repositoryId": "quickshop-hikari",
+            "fileNamePattern": "QuickShop-Hikari.*\\.jar"
+        }
+    ]
+}
+```
+
+### ステップ2: プラグインを追加
+
+ゲーム内またはコンソールで以下のコマンドを実行:
+
+```bash
+/mpm add QuickShop
+```
+
+これで、QuickShopが管理対象に追加されます。
+
+### ステップ3: プラグインをインストール
+
+```bash
+/mpm install
+```
+
+プラグインが自動的にダウンロードされ、インストールされます！
+
+### ステップ4: サーバーを再起動
+
+```bash
+/restart
+```
+
+または、サーバーコンソールから:
+```bash
+stop
+```
+
+## 実践例: サーバーセットアップ
+
+### シナリオ: 新しいサーバーに必須プラグインをインストール
+
+1. **必要なプラグインのリストを作成**
+   - LuckPerms（権限管理）
+   - Vault（経済システム）
+   - EssentialsX（基本機能）
+   - WorldEdit（ワールド編集）
+
+2. **リポジトリファイルを作成**
+
+コマンドで自動生成：
+
+```bash
+/mpm create-repo LuckPerms https://modrinth.com/plugin/luckperms
+/mpm create-repo Vault https://www.spigotmc.org/resources/vault.34315/
+/mpm create-repo EssentialsX https://github.com/EssentialsX/Essentials "EssentialsX-[0-9\\.]+\\.jar"
+/mpm create-repo WorldEdit https://modrinth.com/plugin/worldedit
+```
+
+または、手動でJSONファイルを作成：
+
+**repository/LuckPerms.json:**
+```json
+{
+    "id": "LuckPerms",
+    "repositories": [
+        {
+            "type": "modrinth",
+            "repositoryId": "luckperms"
+        }
+    ]
+}
+```
+
+**repository/Vault.json:**
+```json
+{
+    "id": "Vault",
+    "repositories": [
+        {
+            "type": "spigotmc",
+            "repositoryId": "34315"
+        }
+    ]
+}
+```
+
+**repository/EssentialsX.json:**
+```json
+{
+    "id": "EssentialsX",
+    "repositories": [
+        {
+            "type": "github",
+            "repositoryId": "EssentialsX/Essentials",
+            "fileNamePattern": "EssentialsX-[0-9\\.]+\\.jar"
+        }
+    ]
+}
+```
+
+**repository/WorldEdit.json:**
+```json
+{
+    "id": "WorldEdit",
+    "repositories": [
+        {
+            "type": "modrinth",
+            "repositoryId": "worldedit"
+        }
+    ]
+}
+```
+
+3. **プラグインを一括追加**
+
+```bash
+/mpm add LuckPerms
+/mpm add Vault
+/mpm add EssentialsX
+/mpm add WorldEdit
+```
+
+4. **すべてインストール**
+
+```bash
+/mpm install
+```
+
+5. **インストール確認**
+
+```bash
+/mpm list
+```
+
+## よくある質問
+
+### Q: リポジトリファイルを簡単に作成する方法はありますか？
+
+A: `mpm create-repo`コマンドを使用すると、URLから自動的にリポジトリファイルを生成できます：
+
+```bash
+/mpm create-repo <プラグイン名> <URL> [fileNamePattern]
+```
+
+**例:**
+```bash
+/mpm create-repo QuickShop https://modrinth.com/plugin/quickshop-hikari
+/mpm create-repo EssentialsX https://github.com/EssentialsX/Essentials "EssentialsX-.*\\.jar"
+```
+
+対応プラットフォーム: GitHub, Modrinth, SpigotMC
+
+### Q: リポジトリファイルはどこに配置すればいいですか？
+
+A: `plugins/MinecraftPluginManager/repository/`ディレクトリに配置します。
+ファイル名は`<プラグイン名>.json`の形式にしてください。
+`mpm create-repo`コマンドを使用すると、自動的に適切な場所に配置されます。
+
+### Q: 複数のダウンロード元を設定できますか？
+
+A: はい！リポジトリ配列に複数のエントリを追加できます：
+
+```json
+{
+    "id": "LuckPerms",
+    "repositories": [
+        {
+            "type": "modrinth",
+            "repositoryId": "luckperms"
+        },
+        {
+            "type": "github",
+            "repositoryId": "LuckPerms/LuckPerms",
+            "fileNamePattern": "LuckPerms-Bukkit.*\\.jar"
+        }
+    ]
+}
+```
+
+最初のリポジトリ（Modrinth）からのダウンロードに失敗した場合、次のリポジトリ（GitHub）を試行します。
+これにより、より高い可用性と柔軟性を実現できます。
+
+### Q: プラグインを更新するには？
+
+A: 以下のコマンドで更新を確認・実行できます：
+
+```bash
+# 更新確認
+/mpm outdatedAll
+
+# 更新実行
+/mpm update
+```
+
+### Q: 古い`mpm install <url>`形式は使えますか？
+
+A: この形式は削除されました。代わりに、新しいワークフローを使用してください：
+
+1. `mpm create-repo`コマンドでリポジトリファイルを作成
+2. `mpm add`でプラグインを管理対象に追加
+3. `mpm install`でインストール
+
+**旧方式:**
+```bash
+/mpm install https://modrinth.com/plugin/quickshop-hikari
+```
+
+**新方式:**
+```bash
+/mpm create-repo QuickShop https://modrinth.com/plugin/quickshop-hikari
+/mpm add QuickShop
+/mpm install
+```
+
+新しいワークフローは、プラグイン設定の再利用性と管理性を向上させます。
+
+### Q: リポジトリファイルをチームで共有するには？
+
+A: Gitなどのバージョン管理システムを使用します：
+
+```bash
+git add plugins/MinecraftPluginManager/repository/
+git commit -m "Add plugin repository configurations"
+git push
+```
+
+チームメンバーは：
+```bash
+git pull
+/mpm add LuckPerms
+/mpm add Vault
+# ... 他のプラグイン
+/mpm install
+```
+
+## 次のステップ
+
+- [プラグインを管理する](/docs/usage/install) - 詳細なワークフローを学ぶ
+- [プラグイン管理コマンド](/docs/commands/manage) - プラグイン管理コマンドの一覧
+- [リポジトリ管理コマンド](/docs/commands/repo) - リポジトリコマンドの一覧
+- [リポジトリファイル形式](/docs/format/repository) - ファイル形式の詳細
+
+## トラブルシューティング
+
+### プラグインがインストールされない
+
+1. リポジトリファイルの形式を確認
+2. プラグインIDが正しいか確認
+3. ネットワーク接続を確認
+4. ログファイルでエラーメッセージを確認
+
+### 複数ファイルから特定のファイルを選択したい
+
+`fileNamePattern`を使用します：
+
+```json
+{
+    "type": "github",
+    "repositoryId": "EssentialsX/Essentials",
+    "fileNamePattern": "EssentialsX-[0-9\\.]+\\.jar"
+}
+```
+
+または、`mpm create-repo`コマンドで直接指定：
+
+```bash
+/mpm create-repo EssentialsX https://github.com/EssentialsX/Essentials "EssentialsX-[0-9\\.]+\\.jar"
+```
+
+これにより、正規表現にマッチするファイルのみがダウンロードされます。
+
+### 管理外プラグインが削除される
+
+mpm管理下にないプラグインを保持するには、
+`plugins/MinecraftPluginManager/local/`に移動してください。
+
+## サポート
+
+問題が解決しない場合は、以下を確認してください：
+
+- [GitHubリポジトリ](https://github.com/morinoparty/MinecraftPluginManager)
+- [Issue報告](https://github.com/morinoparty/MinecraftPluginManager/issues)

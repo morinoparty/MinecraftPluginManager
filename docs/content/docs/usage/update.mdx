@@ -1,0 +1,72 @@
+---
+title: Updating Plugins
+description: MinecraftPluginManagerでプラグインの更新を行う方法を学びます
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## 手順
+
+### 例) 最新は、v2.0.0で、現在はv1.0.0
+
+```yaml
+mpm:
+    repositories:
+        modrinth:
+            id: mpm
+    version:
+        edit_regex:
+            version: v(.*)
+            id: (.*)
+        current:
+            raw_version: v1.0.0
+            edited_version: 1.0.0
+            raw_download_id: 1.0.0
+            edited_download_id: 1.0.0
+        latest:
+            raw_version: v2.0.0
+            edited_version: 2.0.0
+            raw_download_id: 2.0.0
+            edited_download_id: 2.0.0
+    download:
+        lock: false
+        autoUpdate: true
+        downloadUrl: https://example.com/<version.editedLatestVersion>/plasmo-voice.jar
+```
+
+1. プラグインの更新を確認する。
+
+```bash
+/mpm outdatedAll || /mpm outdated <plugin>
+```
+
+上記コマンドを実行すると、以下のような出力が得られます。
+
+`version.latest.raw_version`および、`version.latest.raw_download_id`が更新され、`version.edit_regex`で編集された
+`version.latest.edited_version`および、`version.latest.edited_download_id`が更新されます。
+
+
+2. プラグインを更新する。
+
+```bash
+/mpm update
+```
+
+`version.current.edited_download_id`と`version.latest.edited_download_id`を比較し、
+変化がある場合は、`download.download_url`のダウンロードURLを使用して、プラグインを更新します。
+その際に、`version.current.*`が更新されます。
+
+<Callout type="warn">
+なお、この際に`download.download_url`を利用し、ダウンロードが行えなかった場合revert処理として、
+`version.latest.*`が`version.current.*`に戻り、`outdated`実行前の状態に戻ります。
+</Callout>
+
+## 自動アップデート
+
+```yaml
+mpm:
+    download:
+        auto_update: true
+```
+
+`download.auto_update`がtrueの場合、起動時にプラグインの更新を確認し、更新がある場合は、プラグインを更新します。

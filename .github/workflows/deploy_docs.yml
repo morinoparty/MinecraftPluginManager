@@ -35,23 +35,21 @@ jobs:
       - uses: pnpm/action-setup@v4.2.0
         name: Install pnpm
         with:
-          version: 9
+          version: 10
           run_install: false
 
       - name: Install
         working-directory: docs
-        run: |
-          pnpm install
+        run: pnpm ci
 
       - name: Build
         working-directory: docs
-        run: |
-          pnpm run build
+        run: pnpm run build
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./docs/build
+          path: ./docs/out
 
   deploy:
     name: Deploy to GitHub Pages

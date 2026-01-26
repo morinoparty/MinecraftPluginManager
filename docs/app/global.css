@@ -1,0 +1,9 @@
+/* Tailwind CSS */
+@import "tailwindcss";
+
+/* Fumadocs UI styles */
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+@import "./mori.css";
+@import "./fumadocs-theme.css";
