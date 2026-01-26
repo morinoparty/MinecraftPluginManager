@@ -67,7 +67,8 @@ jobs:
       - name: Build docs
         working-directory: docs
         env:
-          BASE_PATH: /mpm/${{ env.COMMIT_SHORT_SHA }}
+          BASE_PATH: /mpm/${{ env.COMMIT_SHORT_SHA }}/docs
+          NEXT_PUBLIC_BASE_PATH: /mpm/${{ env.COMMIT_SHORT_SHA }}/docs
         run: pnpm run build
 
       - name: Build with Gradle
@@ -85,7 +86,8 @@ jobs:
           cp -r ./paper/build/reports/tests/test/* ./upload/junit/
           mkdir -p ./upload/detekt
           cp -r ./build/reports/detekt/* ./upload/detekt/
-          cp -r ./docs/out/* ./upload/
+          mkdir -p ./upload/docs
+          cp -r ./docs/out/* ./upload/docs/
           aws s3 cp ./upload --endpoint-url ${S3_ENDPOINT} s3://${{ env.S3_UPLOAD_BUCKET }}/mpm/${{ env.COMMIT_SHORT_SHA }} --recursive --checksum-algorithm=CRC32 || echo "S3 upload completed with warnings"
 
       - name: Publish test results

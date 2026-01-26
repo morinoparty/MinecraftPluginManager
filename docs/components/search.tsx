@@ -3,6 +3,8 @@ import { create } from "@orama/orama";
 import { createTokenizer } from "@orama/tokenizers/japanese";
 import { stopwords as japaneseStopwords } from "@orama/stopwords/japanese";
 import { useDocsSearch } from "fumadocs-core/search/client";
+
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 import {
     SearchDialog,
     SearchDialogClose,
@@ -31,7 +33,7 @@ function initOrama() {
 export default function DefaultSearchDialog(props: SharedProps) {
     const { search, setSearch, query } = useDocsSearch({
         type: "static",
-        from: "/api/search/index.json",
+        from: `${basePath}/api/search/index.json`,
         initOrama,
     });
 
