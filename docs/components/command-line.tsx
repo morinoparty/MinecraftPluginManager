@@ -7,13 +7,7 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-import {
-    AlertCircle,
-    Check,
-    CircleAlert,
-    CircleCheckBig,
-    HandHelping,
-} from "lucide-react";
+import { AlertCircle, Check, CircleAlert, CircleCheckBig, HandHelping } from "lucide-react";
 import type React from "react";
 
 interface CommandLineProps {
@@ -21,10 +15,7 @@ interface CommandLineProps {
     command: string;
 }
 
-export const CommandLine: React.FC<CommandLineProps> = ({
-    status,
-    command,
-}) => {
+export const CommandLine: React.FC<CommandLineProps> = ({ status, command }) => {
     // アイコンの色を状態に応じて設定
     const getIconColor = (status: string): string => {
         const colors: { [key: string]: string } = {
@@ -53,7 +44,9 @@ export const CommandLine: React.FC<CommandLineProps> = ({
     const bgClass = getBackgroundColor(status);
 
     return (
-        <div className={`not-prose flex items-center rounded-lg border px-4 py-2.5 text-sm font-mono text-fd-foreground ${bgClass}`}>
+        <div
+            className={`not-prose flex items-center rounded-lg border px-4 py-2.5 text-sm font-mono text-fd-foreground ${bgClass}`}
+        >
             {status === "deprecated" && <AlertCircle className={iconClass} />}
             {status === "proposal" && <HandHelping className={iconClass} />}
             {status === "beta" && <CircleAlert className={iconClass} />}

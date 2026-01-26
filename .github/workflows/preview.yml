@@ -59,7 +59,7 @@ jobs:
 
       - name: Install docs dependencies
         working-directory: docs
-        run: pnpm install
+        run: pnpm i --frozen-lockfile
 
       - name: Generate Dokka API documentation
         run: ./gradlew dokkaGenerate
@@ -67,7 +67,7 @@ jobs:
       - name: Build docs
         working-directory: docs
         env:
-          VITE_BASE_URL: /mpm/${{ env.COMMIT_SHORT_SHA }}/
+          BASE_PATH: /mpm/${{ env.COMMIT_SHORT_SHA }}
         run: pnpm run build
 
       - name: Build with Gradle
@@ -85,7 +85,7 @@ jobs:
           cp -r ./paper/build/reports/tests/test/* ./upload/junit/
           mkdir -p ./upload/detekt
           cp -r ./build/reports/detekt/* ./upload/detekt/
-          cp -r ./docs/dist/client/* ./upload/
+          cp -r ./docs/out/* ./upload/
           aws s3 cp ./upload --endpoint-url ${S3_ENDPOINT} s3://${{ env.S3_UPLOAD_BUCKET }}/mpm/${{ env.COMMIT_SHORT_SHA }} --recursive --checksum-algorithm=CRC32 || echo "S3 upload completed with warnings"
 
       - name: Publish test results
@@ -108,7 +108,7 @@ jobs:
           ARTIFACT_URL_API: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/jars/${{ env.PROJECT_NAME }}-api-${{ env.COMMIT_SHORT_SHA }}.jar"
           JUNIT_REPORT_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/junit/index.html"
           DETEKT_REPORT_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/detekt/detekt.html"
-          DOCS_PREVIEW_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/docs/intro"
+          DOCS_PREVIEW_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/docs/intro/index.html"
           DOKKA_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/dokka/index.html"
           LIMIT_TIME: ${{ env.LIMIT_TIME }}
         run: |

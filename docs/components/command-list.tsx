@@ -9,9 +9,9 @@
 
 "use client";
 
-import { CommandSection } from "@/app/components/command-section";
-import type { Commands } from "@/app/types/command";
-import { commandsSchema } from "@/app/types/command";
+import { CommandSection } from "@/components/command-section";
+import type { Commands } from "@/types/command";
+import { commandsSchema } from "@/types/command";
 import React from "react";
 
 // 各カテゴリのJSONデータをインポート
@@ -39,10 +39,7 @@ const getCommandsData = (category: string): Commands => {
 };
 
 // JSONファイルを読み込んでコマンド一覧を表示するコンポーネント
-export const CommandList: React.FC<CommandListProps> = ({
-    category,
-    section,
-}) => {
+export const CommandList: React.FC<CommandListProps> = ({ category, section }) => {
     // カテゴリに応じたデータを取得
     const commandsData = getCommandsData(category);
 
@@ -51,9 +48,7 @@ export const CommandList: React.FC<CommandListProps> = ({
 
     // セクションでフィルタリング（指定された場合のみ）
     const filteredCommands = section
-        ? validatedData.commands.filter(
-              (command) => command.section === section,
-          )
+        ? validatedData.commands.filter((command) => command.section === section)
         : validatedData.commands;
 
     return (
@@ -61,9 +56,7 @@ export const CommandList: React.FC<CommandListProps> = ({
             {filteredCommands.map((command, index) => (
                 <React.Fragment key={index}>
                     <CommandSection command={command} />
-                    {index < filteredCommands.length - 1 && (
-                        <hr className="mt-8 mb-8" />
-                    )}
+                    {index < filteredCommands.length - 1 && <hr className="mt-8 mb-8" />}
                 </React.Fragment>
             ))}
         </div>

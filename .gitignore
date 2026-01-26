@@ -128,11 +128,11 @@ bin/
 
 **/.wrangler
 
-# Docs (fumadocs/vite)
+# Docs (fumadocs/next.js)
 docs/.source
-docs/.tanstack
-docs/dist
-docs/app/routeTree.gen.ts
+docs/.next
+docs/out
+docs/next-env.d.ts
 
 # Playwright MCP
 .playwright-mcp/

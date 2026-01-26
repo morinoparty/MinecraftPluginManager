@@ -40,18 +40,16 @@ jobs:
 
       - name: Install
         working-directory: docs
-        run: |
-          pnpm install
+        run: pnpm ci
 
       - name: Build
         working-directory: docs
-        run: |
-          pnpm run build
+        run: pnpm run build
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./docs/dist/client
+          path: ./docs/out
 
   deploy:
     name: Deploy to GitHub Pages

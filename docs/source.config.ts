@@ -1,6 +1,6 @@
-import { defineDocs } from "fumadocs-mdx/config";
+import { defineConfig, defineDocs } from "fumadocs-mdx/config";
 
-export const { docs, meta } = defineDocs({
+export const docs = defineDocs({
     dir: "content/docs",
     docs: {
         postprocess: {
@@ -8,3 +8,5 @@ export const { docs, meta } = defineDocs({
         },
     },
 });
+
+export default defineConfig({});

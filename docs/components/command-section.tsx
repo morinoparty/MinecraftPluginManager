@@ -7,8 +7,8 @@
  * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-import { CommandLine } from "@/app/components/command-line";
-import type { Command } from "@/app/types/command";
+import { CommandLine } from "@/components/command-line";
+import type { Command } from "@/types/command";
 import type React from "react";
 
 // 個別のコマンドセクションを表示するコンポーネント

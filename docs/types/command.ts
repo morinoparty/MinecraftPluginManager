@@ -9,13 +9,7 @@
 import { z } from "zod";
 
 // コマンドのステータス
-const commandStatusSchema = z.enum([
-    "stable",
-    "newly",
-    "beta",
-    "proposal",
-    "deprecated",
-]);
+const commandStatusSchema = z.enum(["stable", "newly", "beta", "proposal", "deprecated"]);
 
 // コマンドの引数
 const commandArgumentSchema = z.object({
