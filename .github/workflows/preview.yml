@@ -124,6 +124,8 @@ jobs:
       S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
       COMMIT_SHORT_SHA: ${{ needs.build-gradle.outputs.commit_sha }}
     steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
