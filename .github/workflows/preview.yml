@@ -7,22 +7,16 @@ permissions:
   pull-requests: write
   contents: write
 
+env:
+  PREVIEW_BASE_URL: https://moripa-ci.nikomaru.dev/mpm
+  PROJECT_NAME: mpm
 
 jobs:
-  build:
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_EC2_METADATA_DISABLED: true
-      AWS_REGION: auto
-      AWS_CLI_FILE_ENCODING: UTF-8
-      AWS_DEFAULT_S3_SIGNATURE_VERSION: s3v4
-      S3_UPLOAD_BUCKET: ${{ secrets.S3_UPLOAD_BUCKET }}
-      S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-      PREVIEW_BASE_URL: https://moripa-ci.nikomaru.dev/mpm
-      PROJECT_NAME: mpm
+  # Gradle/Dokka ビルド
+  build-gradle:
     runs-on: ubuntu-latest
-
+    outputs:
+      commit_sha: ${{ steps.vars.outputs.sha }}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
@@ -31,6 +25,55 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Set short git commit SHA
+        id: vars
+        run: |
+          calculatedSha=$(git rev-parse --short HEAD)
+          echo "sha=$calculatedSha" >> $GITHUB_OUTPUT
+
+      - name: Change plugin.yml version
+        run: |
+          before="$GITHUB_ENV"
+          after="${before//v/}"
+          sed -i 's/VersionPlaceholder/$after/' ./gradle.properties
+
+      - name: Generate Dokka API documentation
+        run: ./gradlew dokkaGenerate
+
+      - name: Build with Gradle
+        continue-on-error: true
+        run: ./gradlew build
+
+      - name: Publish test results
+        id: publish-test-results
+        uses: mikepenz/action-junit-report@a294a61c909bd8a4b563024a2faa28897fd53ebc # v6.1.0
+        if: success() || failure()
+        with:
+          report_paths: './**/build/test-results/test/TEST-*.xml'
+
+      - name: Upload Gradle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-artifacts
+          retention-days: 1
+          path: |
+            paper/build/libs/paper-*-all.jar
+            api/build/libs/api-*.jar
+            paper/build/reports/tests/test/
+            build/reports/detekt/
+            docs/docs/dokka/
+
+  # Docs ビルド
+  build-docs:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.vars.outputs.sha }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
@@ -42,60 +85,71 @@ jobs:
           version: 10
           run_install: false
 
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
-
       - name: Set short git commit SHA
         id: vars
         run: |
           calculatedSha=$(git rev-parse --short HEAD)
-          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
-
-      - name: change plugin.yml version
-        run: |
-          before="$GITHUB_ENV"
-          after="${before//v/}"
-          sed -i 's/VersionPlaceholder/$after/' ./gradle.properties
+          echo "sha=$calculatedSha" >> $GITHUB_OUTPUT
 
       - name: Install docs dependencies
         working-directory: docs
         run: pnpm i --frozen-lockfile
 
-      - name: Generate Dokka API documentation
-        run: ./gradlew dokkaGenerate
-
       - name: Build docs
         working-directory: docs
         env:
-          BASE_PATH: /mpm/${{ env.COMMIT_SHORT_SHA }}/docs
-          NEXT_PUBLIC_BASE_PATH: /mpm/${{ env.COMMIT_SHORT_SHA }}/docs
+          BASE_PATH: /mpm/${{ steps.vars.outputs.sha }}/docs
+          NEXT_PUBLIC_BASE_PATH: /mpm/${{ steps.vars.outputs.sha }}/docs
         run: pnpm run build
 
-      - name: Build with Gradle
-        continue-on-error: true
-        run: ./gradlew build
-
-      - name: Upload build artifacts
-        id: upload-artifacts
-        run: |
-          mkdir -p ./upload
-          mkdir -p ./upload/jars
-          mv ./paper/build/libs/paper-*-all.jar ./upload/jars/${{ env.PROJECT_NAME }}-paper-${{ env.COMMIT_SHORT_SHA }}.jar
-          mv ./api/build/libs/api-*.jar ./upload/jars/${{ env.PROJECT_NAME }}-api-${{ env.COMMIT_SHORT_SHA }}.jar
-          mkdir -p ./upload/junit
-          cp -r ./paper/build/reports/tests/test/* ./upload/junit/
-          mkdir -p ./upload/detekt
-          cp -r ./build/reports/detekt/* ./upload/detekt/
-          mkdir -p ./upload/docs
-          cp -r ./docs/out/* ./upload/docs/
-          aws s3 cp ./upload --endpoint-url ${S3_ENDPOINT} s3://${{ env.S3_UPLOAD_BUCKET }}/mpm/${{ env.COMMIT_SHORT_SHA }} --recursive --checksum-algorithm=CRC32 || echo "S3 upload completed with warnings"
-
-      - name: Publish test results
-        id: publish-test-results
-        uses: mikepenz/action-junit-report@a294a61c909bd8a4b563024a2faa28897fd53ebc # v6.1.0
-        if: success() || failure()
+      - name: Upload docs artifacts
+        uses: actions/upload-artifact@v4
         with:
-          report_paths: './**/build/test-results/test/TEST-*.xml'
+          name: docs-artifacts
+          retention-days: 1
+          path: docs/out/
+
+  # S3 アップロード & PRコメント
+  upload:
+    needs: [build-gradle, build-docs]
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_EC2_METADATA_DISABLED: true
+      AWS_REGION: auto
+      AWS_CLI_FILE_ENCODING: UTF-8
+      AWS_DEFAULT_S3_SIGNATURE_VERSION: s3v4
+      S3_UPLOAD_BUCKET: ${{ secrets.S3_UPLOAD_BUCKET }}
+      S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+      COMMIT_SHORT_SHA: ${{ needs.build-gradle.outputs.commit_sha }}
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare upload directory
+        run: |
+          mkdir -p ./upload/jars
+          mkdir -p ./upload/junit
+          mkdir -p ./upload/detekt
+          mkdir -p ./upload/docs
+          mkdir -p ./upload/dokka
+
+          # Gradle artifacts
+          mv artifacts/gradle-artifacts/paper/build/libs/paper-*-all.jar ./upload/jars/${{ env.PROJECT_NAME }}-paper-${{ env.COMMIT_SHORT_SHA }}.jar || true
+          mv artifacts/gradle-artifacts/api/build/libs/api-*.jar ./upload/jars/${{ env.PROJECT_NAME }}-api-${{ env.COMMIT_SHORT_SHA }}.jar || true
+          cp -r artifacts/gradle-artifacts/paper/build/reports/tests/test/* ./upload/junit/ || true
+          cp -r artifacts/gradle-artifacts/build/reports/detekt/* ./upload/detekt/ || true
+          cp -r artifacts/gradle-artifacts/docs/docs/dokka/* ./upload/dokka/ || true
+
+          # Docs artifacts
+          cp -r artifacts/docs-artifacts/* ./upload/docs/
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp ./upload --endpoint-url ${S3_ENDPOINT} s3://${{ env.S3_UPLOAD_BUCKET }}/mpm/${{ env.COMMIT_SHORT_SHA }} --recursive --checksum-algorithm=CRC32 || echo "S3 upload completed with warnings"
 
       - name: Get limit time
         id: limit-time
@@ -104,7 +158,6 @@ jobs:
           echo "LIMIT_TIME=$limit_time" >> $GITHUB_ENV
 
       - name: Create comment file
-        id: create-comment-file
         env:
           ARTIFACT_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/jars/${{ env.PROJECT_NAME }}-paper-${{ env.COMMIT_SHORT_SHA }}.jar"
           ARTIFACT_URL_API: "${{ env.PREVIEW_BASE_URL }}/${{ env.COMMIT_SHORT_SHA }}/jars/${{ env.PROJECT_NAME }}-api-${{ env.COMMIT_SHORT_SHA }}.jar"
@@ -143,28 +196,10 @@ jobs:
               <td><a href="$DETEKT_REPORT_URL">$DETEKT_REPORT_URL</a></td>
             </tr>
           </table>
-
-          ## Test summary
-
-          <table>
-              <tr>
-              <th>
-                <th>Tests 💯</th>
-                <th>Passed ✅</th>
-                <th>Skipped ⏭️</th>
-                <th>Failed ❌</th>
-              </tr>
-              <tr>
-                <td>JUnit Test Report</td>
-                <td>${{ steps.publish-test-results.outputs.total }} ran</td>
-                <td>${{ steps.publish-test-results.outputs.passed }} passed</td>
-                <td>${{ steps.publish-test-results.outputs.skipped }} skipped</td>
-                <td>${{ steps.publish-test-results.outputs.failed }} failed</td>
-              </tr>
-            </table>
           EOF
+
       - name: Create PR comment
-        if: ${{ job.status == 'success' && (github.event.action == 'opened' || github.event.action == 'synchronize') }}
+        if: ${{ github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize') }}
         run: gh pr comment ${{ github.event.number }} --body-file comment.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
