@@ -12,8 +12,8 @@ env:
   PROJECT_NAME: mpm
 
 jobs:
-  # Gradle/Dokka ビルド
-  build-gradle:
+  # Gradle ビルド (JAR + テスト + detekt)
+  build-jar:
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.vars.outputs.sha }}
@@ -41,9 +41,9 @@ jobs:
           after="${before//v/}"
           sed -i 's/VersionPlaceholder/$after/' ./gradle.properties
 
-      - name: Build with Gradle (includes Dokka)
+      - name: Build with Gradle
         continue-on-error: true
-        run: ./gradlew build dokkaGenerate --parallel
+        run: ./gradlew build --parallel
 
       - name: Publish test results
         id: publish-test-results
@@ -52,17 +52,41 @@ jobs:
         with:
           report_paths: './**/build/test-results/test/TEST-*.xml'
 
-      - name: Upload Gradle artifacts
+      - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: gradle-artifacts
+          name: jar-artifacts
           retention-days: 1
           path: |
             paper/build/libs/paper-*-all.jar
             api/build/libs/api-*.jar
             paper/build/reports/tests/test/
             build/reports/detekt/
-            docs/docs/dokka/
+
+  # Dokka ドキュメント生成
+  build-dokka:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Generate Dokka API documentation
+        run: ./gradlew dokkaGenerate
+
+      - name: Upload Dokka artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dokka-artifacts
+          retention-days: 1
+          path: docs/docs/dokka/
 
   # Docs ビルド
   build-docs:
@@ -108,7 +132,7 @@ jobs:
 
   # S3 アップロード & PRコメント
   upload:
-    needs: [build-gradle, build-docs]
+    needs: [build-jar, build-dokka, build-docs]
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -119,7 +143,7 @@ jobs:
       AWS_DEFAULT_S3_SIGNATURE_VERSION: s3v4
       S3_UPLOAD_BUCKET: ${{ secrets.S3_UPLOAD_BUCKET }}
       S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-      COMMIT_SHORT_SHA: ${{ needs.build-gradle.outputs.commit_sha }}
+      COMMIT_SHORT_SHA: ${{ needs.build-jar.outputs.commit_sha }}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
@@ -136,12 +160,14 @@ jobs:
           mkdir -p ./upload/docs
           mkdir -p ./upload/dokka
 
-          # Gradle artifacts
-          mv artifacts/gradle-artifacts/paper/build/libs/paper-*-all.jar ./upload/jars/${{ env.PROJECT_NAME }}-paper-${{ env.COMMIT_SHORT_SHA }}.jar || true
-          mv artifacts/gradle-artifacts/api/build/libs/api-*.jar ./upload/jars/${{ env.PROJECT_NAME }}-api-${{ env.COMMIT_SHORT_SHA }}.jar || true
-          cp -r artifacts/gradle-artifacts/paper/build/reports/tests/test/* ./upload/junit/ || true
-          cp -r artifacts/gradle-artifacts/build/reports/detekt/* ./upload/detekt/ || true
-          cp -r artifacts/gradle-artifacts/docs/docs/dokka/* ./upload/dokka/ || true
+          # JAR artifacts
+          mv artifacts/jar-artifacts/paper/build/libs/paper-*-all.jar ./upload/jars/${{ env.PROJECT_NAME }}-paper-${{ env.COMMIT_SHORT_SHA }}.jar || true
+          mv artifacts/jar-artifacts/api/build/libs/api-*.jar ./upload/jars/${{ env.PROJECT_NAME }}-api-${{ env.COMMIT_SHORT_SHA }}.jar || true
+          cp -r artifacts/jar-artifacts/paper/build/reports/tests/test/* ./upload/junit/ || true
+          cp -r artifacts/jar-artifacts/build/reports/detekt/* ./upload/detekt/ || true
+
+          # Dokka artifacts
+          cp -r artifacts/dokka-artifacts/* ./upload/dokka/ || true
 
           # Docs artifacts
           cp -r artifacts/docs-artifacts/* ./upload/docs/
