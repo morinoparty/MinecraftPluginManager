@@ -41,12 +41,9 @@ jobs:
           after="${before//v/}"
           sed -i 's/VersionPlaceholder/$after/' ./gradle.properties
 
-      - name: Generate Dokka API documentation
-        run: ./gradlew dokkaGenerate
-
-      - name: Build with Gradle
+      - name: Build with Gradle (includes Dokka)
         continue-on-error: true
-        run: ./gradlew build
+        run: ./gradlew build dokkaGenerate --parallel
 
       - name: Publish test results
         id: publish-test-results
