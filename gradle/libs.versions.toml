@@ -44,7 +44,7 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 mineauth-api = { group = "party.morino", name = "mineauth-api", version = "0.3.7" }
 
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
-snakeyaml = { group = "org.yaml", name = "snakeyaml", version = "2.6" }
+snakeyaml = { group = "org.yaml", name = "snakeyaml", version = "2.7" }
 
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutine" }
 
