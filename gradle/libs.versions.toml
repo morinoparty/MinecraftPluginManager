@@ -1,6 +1,6 @@
 [versions]
 lamp = "4.0.0-rc.18"
-paper = "26.2.build.119-stable"
+paper = "26.2.build.121-stable"
 mccoroutine = "2.22.0"
 koin = "4.2.2"
 coroutine = "1.11.0"
@@ -44,7 +44,7 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 mineauth-api = { group = "party.morino", name = "mineauth-api", version = "0.3.7" }
 
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
-snakeyaml = { group = "org.yaml", name = "snakeyaml", version = "2.6" }
+snakeyaml = { group = "org.yaml", name = "snakeyaml", version = "2.7" }
 
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutine" }
 
