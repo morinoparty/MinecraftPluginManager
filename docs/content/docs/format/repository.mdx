@@ -221,9 +221,9 @@ Hangar（PaperMC公式プラグインリポジトリ）からプラグインを�
 
 - **fileNameTemplate**: ダウンロード後のファイル名テンプレート
   - ダウンロードしたファイルをリネームする場合に使用
-  - プレースホルダー: `<version>`, `<version.major>`, `<version.minor>`, `<version.patch>`
-  - 例: `"luckperms-<version>.jar"` → `"luckperms-5.4.97.jar"`
-  - データ構造としてサポート済み、機能実装は今後予定
+  - プレースホルダー: `<pluginInfo.name>`（プラグイン名）, `<mpmInfo.version.current.normalized>`（正規化済みバージョン）
+  - 例: `"<pluginInfo.name>_<mpmInfo.version.current.normalized>.jar"` → `"mpm_0.0.26.jar"`
+  - 省略時は `"<pluginInfo.name>-<mpmInfo.version.current.normalized>.jar"` が使われます
 
 ### 🔗 依存関係フィールド
 

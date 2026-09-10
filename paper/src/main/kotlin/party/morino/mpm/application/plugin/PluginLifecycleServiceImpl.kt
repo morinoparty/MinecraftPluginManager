@@ -25,6 +25,7 @@ import party.morino.mpm.api.application.model.add.PluginAddResult
 import party.morino.mpm.api.application.model.install.InstallResult
 import party.morino.mpm.api.application.model.install.PluginInstallInfo
 import party.morino.mpm.api.application.model.install.PluginRemovalInfo
+import party.morino.mpm.api.application.plugin.DeferredJarDeletion
 import party.morino.mpm.api.application.plugin.IntegrityVerifier
 import party.morino.mpm.api.application.plugin.PluginInfoService
 import party.morino.mpm.api.application.plugin.PluginLifecycleService
@@ -56,9 +57,10 @@ import party.morino.mpm.event.lifecycle.PluginRemoveEvent
 import party.morino.mpm.event.lifecycle.PluginUninstallEvent
 import party.morino.mpm.infrastructure.downloader.PluginDownloadException
 import party.morino.mpm.utils.BukkitDispatcher
-import party.morino.mpm.utils.DataClassReplacer.replaceTemplate
+import party.morino.mpm.utils.FileNameTemplate
 import party.morino.mpm.utils.PluginDataUtils
 import party.morino.mpm.utils.replaceJarAtomically
+import party.morino.mpm.utils.retireOldJar
 import java.io.File
 import party.morino.mpm.api.domain.plugin.model.VersionSpecifier as LegacyVersionSpecifier
 
@@ -77,6 +79,9 @@ class PluginLifecycleServiceImpl :
     private val downloaderRepository: DownloaderRepository by inject()
     private val metadataManager: PluginMetadataManager by inject()
     private val plugin: JavaPlugin by inject()
+
+    // 旧JARを即時削除できない場合（mpm 自身の更新など）の削除予約
+    private val deferredJarDeletion: DeferredJarDeletion by inject()
     private val infoService: PluginInfoService by inject()
 
     // ダウンロード済みプラグインのAPIバージョン互換性・依存関係の検証を行う共通ロジック
@@ -616,7 +621,7 @@ class PluginLifecycleServiceImpl :
         }
 
         // ファイル名を生成
-        val template = mpmInfo.fileNameTemplate ?: "<pluginInfo.name>-<mpmInfo.version.current.normalized>.jar"
+        val template = mpmInfo.fileNameTemplate ?: FileNameTemplate.DEFAULT
         val newFileName = generateFileName(template, pluginInfo.name, mpmInfo.version.current.normalized)
 
         // staged copy: 配置先と同じディレクトリの一時ファイル経由でアトミックに置換する
@@ -631,13 +636,17 @@ class PluginLifecycleServiceImpl :
                 ).left()
         }
 
+        // 同名の旧JARが削除予約されていた場合（ロールバックなど）、置き直した新JARが停止時に消えないよう予約を取り消す
+        deferredJarDeletion.cancel(targetFile)
+
         // 新しいファイルの配置が成功してから古いファイルを削除する
         val oldFileName = mpmInfo.download.fileName
         var removedInfo: PluginRemovalInfo? = null
         if (oldFileName != null && oldFileName != newFileName) {
             val oldFile = File(pluginsDir, oldFileName)
             if (oldFile.exists()) {
-                oldFile.delete()
+                // mpm 自身の更新や削除できない環境では即時削除せず、サーバー停止時の削除に回す
+                retireOldJar(oldFile, pluginName, plugin, deferredJarDeletion)
                 removedInfo =
                     PluginRemovalInfo(
                         name = pluginName,
@@ -1341,37 +1350,7 @@ class PluginLifecycleServiceImpl :
         template: String,
         pluginName: String,
         versionString: String
-    ): String {
-        // テンプレート置換用のデータクラス
-        data class PluginInfo(
-            val name: String
-        )
-
-        data class CurrentVersion(
-            val normalized: String
-        )
-
-        data class MpmInfoVersion(
-            val current: CurrentVersion
-        )
-
-        data class MpmInfo(
-            val version: MpmInfoVersion
-        )
-
-        data class FileNameData(
-            val pluginInfo: PluginInfo,
-            val mpmInfo: MpmInfo
-        )
-
-        val data =
-            FileNameData(
-                pluginInfo = PluginInfo(name = pluginName),
-                mpmInfo = MpmInfo(version = MpmInfoVersion(current = CurrentVersion(normalized = versionString)))
-            )
-
-        return template.replaceTemplate(data)
-    }
+    ): String = FileNameTemplate.render(template, pluginName, versionString)
 
     /**
      * プラグインを依存関係と共に追加・インストールする

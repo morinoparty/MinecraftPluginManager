@@ -19,6 +19,7 @@ import party.morino.mpm.api.application.dependency.DependencyService
 import party.morino.mpm.api.application.health.DoctorService
 import party.morino.mpm.api.application.job.JobService
 import party.morino.mpm.api.application.lock.LockService
+import party.morino.mpm.api.application.plugin.DeferredJarDeletion
 import party.morino.mpm.api.application.plugin.IntegrityVerifier
 import party.morino.mpm.api.application.plugin.PluginInfoService
 import party.morino.mpm.api.application.plugin.PluginLifecycleService
@@ -72,6 +73,7 @@ import party.morino.mpm.infrastructure.mineauth.MineAuthIntegration
 import party.morino.mpm.infrastructure.mineauth.MpmApiPermission
 import party.morino.mpm.infrastructure.persistence.LockRepositoryImpl
 import party.morino.mpm.infrastructure.persistence.ProjectRepositoryImpl
+import party.morino.mpm.infrastructure.plugin.retire.DeferredJarDeletionImpl
 import party.morino.mpm.infrastructure.plugin.scan.InstalledJarScannerImpl
 import party.morino.mpm.infrastructure.plugin.service.PluginMetadataManagerImpl
 import party.morino.mpm.infrastructure.repository.RepositorySourceManagerFactory
@@ -137,6 +139,9 @@ open class Mpm :
             _configManager.reload()
         }
 
+        // 前回の自己更新で削除しきれなかった旧JARを片付ける（自分自身のJARは削除しない）
+        GlobalContext.get().get<DeferredJarDeletion>().cleanupOnStartup(file)
+
         // パーミッション階層の登録（mpm.commandが全子パーミッションを含む）
         registerPermissions()
 
@@ -172,6 +177,9 @@ open class Mpm :
         // Bean未登録でも例外で後続cleanupを止めないようgetOrNullを使用する
         GlobalContext.getOrNull()?.getOrNull<RepositoryManager>()?.shutdown()
         GlobalContext.getOrNull()?.getOrNull<DownloaderRepository>()?.shutdown()
+
+        // 自己更新などで削除を予約していた旧JARを、実行中のJARが不要になるこのタイミングで削除する
+        GlobalContext.getOrNull()?.getOrNull<DeferredJarDeletion>()?.deleteScheduled()
 
         // Koin DIコンテナを停止（リソースリーク防止）
         GlobalContext.stopKoin()
@@ -290,6 +298,9 @@ open class Mpm :
 
                 // plugins ディレクトリのライブスキャン（unmanaged 判定・init で共用）
                 single<InstalledJarScanner> { InstalledJarScannerImpl() }
+
+                // 即時削除できない旧JAR（mpm 自身の更新など）の削除予約
+                single<DeferredJarDeletion> { DeferredJarDeletionImpl() }
 
                 // HTTPメタデータキャッシュとキャッシュ管理（mpm cache コマンドから利用）
                 single<HttpMetadataCache> { HttpMetadataCacheImpl() }
