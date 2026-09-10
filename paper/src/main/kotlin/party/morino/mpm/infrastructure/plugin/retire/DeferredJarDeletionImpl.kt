@@ -39,7 +39,7 @@ class DeferredJarDeletionImpl :
     private val lock = Any()
 
     /**
-     * 予約ファイルの場所（.mpm/pending-delete.json）
+     * 予約ファイルの場所（plugins/mpm/pending-delete.json）
      */
     private val pendingFile: File
         get() = File(pluginDirectory.getRootDirectory(), PENDING_FILE_NAME)
